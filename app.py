@@ -11,5 +11,6 @@ page = st.navigation([
     st.Page("pages/training.py", title="函数训练", default=True),
     st.Page("pages/profile.py", title="知识画像"),
     st.Page("pages/recommendation.py", title="个性化训练推荐"),
+    st.Page("pages/feedback.py", title="AI 学习反馈"),
 ])
 page.run()

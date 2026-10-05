@@ -1,8 +1,8 @@
 # 高中数学个性化 AI 训练系统
 
-教师主导、AI 辅助的数学训练项目。当前完成 V0.1–V0.6，覆盖函数模块 K001–K005。推荐使用确定性规则，未使用机器学习或 LLM，尚未实现自动学习计划或 AI 学习反馈。
+教师主导、AI 辅助的数学训练项目。当前完成 V0.1–V0.7，覆盖函数模块 K001–K005。掌握度和推荐使用确定性规则；AI 仅解释已有结果，尚未实现自动学习计划。
 
-已实现：SQLite 数据基础、高中函数题库、Streamlit 学生训练、学习行为采集、知识掌握度分析、学生知识画像和个性化学习推荐。
+已实现：SQLite 数据基础、高中函数题库、Streamlit 学生训练、学习行为采集、知识掌握度分析、学生知识画像、个性化学习推荐和 AI 个性化学习反馈。
 
 ## 环境与运行
 
@@ -27,6 +27,8 @@ python -m streamlit run app.py
 - `services/profile.py`：现有掌握度结果的显示格式与概览汇总，不重算掌握度。
 - `services/recommendation.py`：前置知识回退、证据量策略、难度匹配及近期题目去重。
 - `pages/recommendation.py`：个性化训练推荐与题目只读预览。
+- `services/feedback.py`：最小学情上下文、Responses API 调用和规则式降级反馈。
+- `pages/feedback.py`：确定性摘要、按需生成按钮及会话反馈缓存。
 - `database/database.py`：统一连接，启用外键，返回 `sqlite3.Row`；调用者负责关闭连接。
 - `init_db.py`：事务内创建三张表，初始化知识点并导入题库。
 - `data/questions.csv`：六道函数单选题及答案、解析。
@@ -36,6 +38,7 @@ python -m streamlit run app.py
 - `tests/test_mastery.py`：临时数据库中的指标、等级边界、证据量及只读计算测试。
 - `tests/test_profile.py`：画像格式、未评估处理、最新数据读取及页面导航测试。
 - `tests/test_recommendation.py`：临时数据库中的推荐规则、题目选择及页面测试。
+- `tests/test_feedback.py`：mock SDK、输入保护、错误降级和请求次数测试。
 
 ## 函数训练
 
@@ -84,6 +87,20 @@ python -c "import json; from services.mastery import calculate_student_mastery; 
 ```powershell
 python -c "import json; from services.recommendation import generate_recommendation; print(json.dumps(generate_recommendation('S001'), ensure_ascii=False, indent=2))"
 ```
+
+## AI 个性化学习反馈
+
+侧栏“AI 学习反馈”先展示确定性数据，只有点击“生成 AI 学习反馈”或“重新生成”才调用官方 OpenAI Responses API。AI 只解释优势、待提升内容和已有推荐，不计算掌握度、正确率、等级，不决定推荐目标、题目或前置关系。文本仅作学习参考，约 250–450 中文字，包含五个固定部分。
+
+配置环境变量 `OPENAI_API_KEY` 和可选的 `OPENAI_MODEL`。空白模板在 `.env.example`；默认模型集中定义为 `gpt-4.1-mini`。当前直接读取进程环境变量，不自动加载 `.env`，无需 python-dotenv。不要将真实密钥放入源码、文档或 Git。
+
+没有密钥时显示“尚未配置 AI 学习反馈服务”，训练、画像和推荐仍可正常运行，并可点击“查看规则式学习反馈”。网络、超时或 API 错误时显示安全提示并使用规则反馈。请求超时 20 秒，SDK 自动重试关闭，避免隐式重复请求。
+
+生成结果保存在会话中，普通 rerun 不调用 API；学情或推荐数据变化会清除旧结果，需再次明确点击生成。只发送必要的知识点指标和推荐摘要，不发送原始作答、SQL、数据库路径或密钥；使用 `store=False`。AI 输出不会写回数据库或确定性服务。
+
+测试通过 mock SDK 进行，不调用真实 API。安装依赖后启动：`python -m streamlit run app.py`。真实 API 验证请自行配置环境变量后手动点击按钮。
+
+实现参考：[官方 Python SDK](https://developers.openai.com/api/reference/python)、[GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini)。
 
 ## 数据约定
 
