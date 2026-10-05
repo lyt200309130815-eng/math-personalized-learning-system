@@ -1,6 +1,6 @@
 # 高中数学个性化 AI 训练系统
 
-教师主导、AI 辅助的数学训练项目。当前完成 **V0.1 数据库基础**及 **V0.2 学生训练页面**，覆盖函数模块 K001–K005。尚无答题记录采集、掌握度算法、推荐系统或 LLM 接入。
+教师主导、AI 辅助的数学训练项目。当前完成 **V0.1 数据库基础**、**V0.2 学生训练页面**、**V0.3 学习数据采集**及 **V0.4 知识掌握度计算**，覆盖函数模块 K001–K005。尚无学生画像页面、推荐系统或 LLM 接入。
 
 ## 环境与运行
 
@@ -18,16 +18,46 @@ python -m streamlit run app.py
 ## 文件职责
 
 - `app.py`：应用入口，默认进入函数训练。
-- `pages/training.py`：中文题目、单选、提交反馈和下一题；状态只保留在当前会话。
+- `pages/training.py`：中文题目、单选、提交反馈和下一题。
+- `services/training.py`：会话状态、单调时钟计时和防重复提交逻辑。
+- `services/mastery.py`：可解释的确定性掌握度计算，不写入数据库。
 - `database/database.py`：统一连接，启用外键，返回 `sqlite3.Row`；调用者负责关闭连接。
 - `init_db.py`：事务内创建三张表，初始化知识点并导入题库。
 - `data/questions.csv`：六道函数单选题及答案、解析。
 - `tests/test_database.py`：使用临时数据库的离线自动测试。
 - `tests/test_training.py`：题库读取、JSON 校验及 Streamlit 交互测试。
+- `tests/test_attempts.py`：作答持久化、最近记录查询和计时、防重复提交测试。
+- `tests/test_mastery.py`：临时数据库中的指标、等级边界、证据量及只读计算测试。
 
 ## 函数训练
 
-页面从 SQLite 查询题目及知识点名称，按题目 ID 排序，不直接读取 CSV。初始无选中答案，提交后显示对错、正确答案、知识点和难度，并锁定选择。“下一题”清除选项与反馈；末题后回到第一题。刷新浏览器会重置会话。本阶段不写入 `attempts`。
+页面从 SQLite 查询题目及知识点名称，按题目 ID 排序，不直接读取 CSV。初始无选中答案，提交后显示对错、正确答案、知识点和难度，并锁定选择。“下一题”清除选项与反馈；末题后回到第一题。刷新浏览器会重置会话，但已保存的数据库记录仍保留。
+
+## 学习数据采集
+
+当前学生固定为 `S001`。有效提交通过参数化 SQL 写入 `attempts`；提示次数和重试次数为 0，错因为空，时间戳由数据库生成。使用 `time.monotonic()` 计算题目首次呈现到首次有效提交的浮点秒数，普通 rerun 不重置计时。“下一题”开始新计时并清除记录标记。同一会话中的同一次提交只保存一次；重新进入同一道题是新的练习。
+
+开发时可只读查看最近记录：
+
+```powershell
+python -c "from database.database import get_recent_attempts; [print(dict(row)) for row in get_recent_attempts('S001', limit=10)]"
+```
+
+## 知识掌握度
+
+`calculate_knowledge_mastery(student_id, knowledge_point_id)` 返回一个字典；`calculate_student_mastery(student_id)` 返回按 ID 排序的 K001–K005 字典列表，含未训练知识点。
+
+模型为 `M = 0.50A + 0.20R + 0.15S + 0.15D`，分数限制在 0–1：A 为全部正确率；R 为最近最多 5 次正确率；S 为 `R × (1 − 总体标准差)`；D 为全部记录按题目难度加权的正确率。近期按 `created_at` 倒序，同时间按 ID 倒序。计算不预先四舍五入。
+
+无记录时，各项指标和掌握度均为 `None`，等级为“未评估”。有记录时，以 0.40、0.60、0.80、0.90 为分界，依次为“明显薄弱”“基础不足”“基本掌握”“熟练”“稳定掌握”；边界属于较高等级。
+
+证据量为：0 次“无数据”、1–2 次“数据较少”、3–5 次“初步判断”、6 次及以上“数据较充分”，不影响分数。即使单次答对得分为 1，也须结合证据量解读。
+
+只读查看实际结果：
+
+```powershell
+python -c "import json; from services.mastery import calculate_student_mastery; print(json.dumps(calculate_student_mastery('S001'), ensure_ascii=False, indent=2))"
+```
 
 ## 数据约定
 

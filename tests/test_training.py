@@ -10,6 +10,7 @@ from streamlit.testing.v1 import AppTest
 
 from database.database import get_connection, get_training_questions
 from init_db import initialize_database
+from database.database import record_attempt
 
 
 class TrainingTests(unittest.TestCase):
@@ -52,9 +53,11 @@ class TrainingTests(unittest.TestCase):
         self.connection.commit()
         self.assertEqual(len(get_training_questions(self.path)), 5)
 
-    def test_training_submission_navigation_and_no_attempt_writes(self) -> None:
+    def test_training_submission_navigation_and_single_attempt_writes(self) -> None:
         original = get_training_questions
-        with patch("database.database.get_training_questions", side_effect=lambda: original(self.path)):
+        with patch("database.database.get_training_questions", side_effect=lambda: original(self.path)), \
+                patch("services.training.record_attempt", side_effect=lambda **kwargs: record_attempt(
+                    **kwargs, database_path=self.path)):
             app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run()
             self.assertEqual(len(app.exception), 0)
             self.assertIsNone(app.radio[0].value)
@@ -67,11 +70,13 @@ class TrainingTests(unittest.TestCase):
             self.assertTrue(app.radio[0].disabled)
             app.run()
             self.assertEqual(app.success[0].value, "回答正确")
+            self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM attempts").fetchone()[0], 1)
             app.button[1].click().run()
             self.assertEqual(app.session_state["question_index"], 1)
             self.assertIsNone(app.radio[0].value)
             self.assertFalse(app.session_state["submitted"])
             self.assertIsNone(app.session_state["feedback"])
+            self.assertIsNone(app.session_state["recorded_attempt_id"])
             self.assertEqual(len(app.success), 0)
             app.radio[0].set_value("A").run()
             app.button[0].click().run()
@@ -83,7 +88,7 @@ class TrainingTests(unittest.TestCase):
             self.assertIsNone(app.radio[0].value)
             self.assertIsNone(app.session_state["feedback"])
             self.assertEqual(len(app.exception), 0)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM attempts").fetchone()[0], 0)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM attempts").fetchone()[0], 2)
 
     def test_empty_database_shows_chinese_message(self) -> None:
         with patch("database.database.get_training_questions", return_value=[]):
