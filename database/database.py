@@ -83,7 +83,7 @@ def get_recent_attempts(
     """Return a student's newest attempts, with ID breaking timestamp ties."""
     if not isinstance(limit, int) or isinstance(limit, bool) or limit < 0:
         raise ValueError("limit must be a nonnegative integer")
-    with closing(get_connection(database_path)) as connection:
+    with closing(get_connection(database_path, read_only=True)) as connection:
         return connection.execute(
             """SELECT * FROM attempts WHERE student_id = ?
                ORDER BY created_at DESC, id DESC LIMIT ?""",
@@ -125,3 +125,18 @@ def get_knowledge_attempts(
                ORDER BY a.created_at DESC, a.id DESC""",
             (student_id, knowledge_point_id),
         ).fetchall()
+
+
+def get_questions_for_knowledge(
+    knowledge_point_id: str, *, database_path: str | Path = DATABASE_PATH,
+) -> list[dict]:
+    """Read practice previews without exposing correct answers or solutions."""
+    with closing(get_connection(database_path, read_only=True)) as connection:
+        rows = connection.execute(
+            """SELECT q.id, q.stem, q.difficulty, q.knowledge_point_id,
+                      k.name AS knowledge_point_name
+               FROM questions AS q JOIN knowledge_points AS k ON k.id = q.knowledge_point_id
+               WHERE q.knowledge_point_id = ? AND q.question_type = ? ORDER BY q.id""",
+            (knowledge_point_id, "single_choice"),
+        ).fetchall()
+    return [dict(row) for row in rows]

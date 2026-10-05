@@ -1,6 +1,8 @@
 # 高中数学个性化 AI 训练系统
 
-教师主导、AI 辅助的数学训练项目。当前完成 **V0.1 数据库基础**、**V0.2 学生训练页面**、**V0.3 学习数据采集**及 **V0.4 知识掌握度计算**，覆盖函数模块 K001–K005。尚无学生画像页面、推荐系统或 LLM 接入。
+教师主导、AI 辅助的数学训练项目。当前完成 V0.1–V0.6，覆盖函数模块 K001–K005。推荐使用确定性规则，未使用机器学习或 LLM，尚未实现自动学习计划或 AI 学习反馈。
+
+已实现：SQLite 数据基础、高中函数题库、Streamlit 学生训练、学习行为采集、知识掌握度分析、学生知识画像和个性化学习推荐。
 
 ## 环境与运行
 
@@ -19,8 +21,12 @@ python -m streamlit run app.py
 
 - `app.py`：应用入口，默认进入函数训练。
 - `pages/training.py`：中文题目、单选、提交反馈和下一题。
+- `pages/profile.py`：只读知识画像、总体概览、横向条形图和详细指标。
 - `services/training.py`：会话状态、单调时钟计时和防重复提交逻辑。
 - `services/mastery.py`：可解释的确定性掌握度计算，不写入数据库。
+- `services/profile.py`：现有掌握度结果的显示格式与概览汇总，不重算掌握度。
+- `services/recommendation.py`：前置知识回退、证据量策略、难度匹配及近期题目去重。
+- `pages/recommendation.py`：个性化训练推荐与题目只读预览。
 - `database/database.py`：统一连接，启用外键，返回 `sqlite3.Row`；调用者负责关闭连接。
 - `init_db.py`：事务内创建三张表，初始化知识点并导入题库。
 - `data/questions.csv`：六道函数单选题及答案、解析。
@@ -28,6 +34,8 @@ python -m streamlit run app.py
 - `tests/test_training.py`：题库读取、JSON 校验及 Streamlit 交互测试。
 - `tests/test_attempts.py`：作答持久化、最近记录查询和计时、防重复提交测试。
 - `tests/test_mastery.py`：临时数据库中的指标、等级边界、证据量及只读计算测试。
+- `tests/test_profile.py`：画像格式、未评估处理、最新数据读取及页面导航测试。
+- `tests/test_recommendation.py`：临时数据库中的推荐规则、题目选择及页面测试。
 
 ## 函数训练
 
@@ -57,6 +65,24 @@ python -c "from database.database import get_recent_attempts; [print(dict(row)) 
 
 ```powershell
 python -c "import json; from services.mastery import calculate_student_mastery; print(json.dumps(calculate_student_mastery('S001'), ensure_ascii=False, indent=2))"
+```
+
+## 学生知识画像
+
+启动 `python -m streamlit run app.py` 后，通过侧栏在“函数训练”和“知识画像”之间切换，当前学生固定为 `S001`。画像每次访问或重新运行均调用 `calculate_student_mastery("S001")`，不缓存结果，也不修改作答数据。
+
+总体概览显示已训练与未评估知识点数、累计答题次数及根据真实作答的正确次数与总次数汇总的正确率，不提供额外综合分数。没有作答时正确率显示“暂无数据”，全部答错时显示“0%”。Streamlit 原生 Vega-Lite 横向条形图统一使用 0–100% 横轴，只展示已评估知识点；未评估项单独列出，不绘制为 0%。每个知识点显示掌握度、掌握等级、训练次数、正确次数和证据量，可展开查看原始 A/R/S/D/M 指标。高分但数据较少时明确提示判断依据有限。无训练记录时显示“暂无训练数据”。
+
+## 个性化学习推荐
+
+侧栏“个性化训练推荐”展示规则式推荐目标、理由和练习预览，不直接作答。`services/recommendation.py` 提供 `recommend_next_knowledge`、`recommend_questions` 和 `generate_recommendation`，均支持临时数据库路径，不写入记录。
+
+优先级为诊断、明显薄弱、基础不足、巩固、验证、提升。诊断与补弱保持前置知识回退；巩固按较低掌握度、较少训练次数和 ID 排序；验证按较低证据量、较少训练次数和 ID 排序；提升优先前置依赖图中深度最大的知识点，同深度再按较低掌握度、较少训练次数和 ID 排序。深度由数据库前置关系推导：无前置为 0，其余为前置最大深度加 1。前置知识未评估或掌握度低于 60% 时递归回退。高分但证据不是“数据较充分”时优先验证；全部高分且证据充分时仍返回提升推荐。
+
+优先难度：诊断或低于 40% 为 1–2；40%–60% 为 2–3；60%–80% 为 3–4；80% 以上为 4–5，但验证使用 2–3。题目排序先区分最近 10 次是否练过，再按距目标难度的距离排序。优先新题，题库不足时补充邻近难度及旧题，并在页面标注；不会重复同一题。默认最多 5 道，实际题库可能更少。
+
+```powershell
+python -c "import json; from services.recommendation import generate_recommendation; print(json.dumps(generate_recommendation('S001'), ensure_ascii=False, indent=2))"
 ```
 
 ## 数据约定
