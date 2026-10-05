@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import os
 import sqlite3
 
 import streamlit as st
@@ -11,6 +10,7 @@ from services.feedback import (
     AIFeedbackUnavailable, build_feedback_context, build_rule_based_feedback, generate_learning_feedback,
 )
 from services.profile import format_percentage
+from services.llm_provider import get_provider_config
 
 
 st.title("AI 学习反馈")
@@ -23,6 +23,13 @@ except (sqlite3.Error, ValueError, FileNotFoundError):
     st.error("学情数据读取失败，请稍后重试；首次使用请先初始化数据库。")
     st.stop()
 
+try:
+    provider_config = get_provider_config()
+except AIFeedbackUnavailable as error:
+    st.warning(str(error))
+    provider_config = {"provider": "invalid", "name": "未配置", "model": "", "configured": False}
+st.write(f"当前 AI 服务：{provider_config['name']}")
+
 target = context["recommendation"]["target_knowledge"]
 st.subheader("确定性学情摘要")
 st.write(f"推荐知识点：{target['knowledge_point_name']}（{target['knowledge_point_id']}）")
@@ -30,16 +37,16 @@ st.write(f"推荐类型：{target['recommendation_type']}")
 st.write(f"当前掌握度：{format_percentage(target['mastery_score'])}")
 st.write(f"证据量：{target['evidence_level']}")
 
-fingerprint = hashlib.sha256(json.dumps(context, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+fingerprint = hashlib.sha256(json.dumps([context, provider_config], ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
 if st.session_state.get("feedback_fingerprint") != fingerprint:
     st.session_state.feedback_fingerprint = fingerprint
     st.session_state.learning_feedback = None
     st.session_state.learning_feedback_source = None
     st.session_state.learning_feedback_error = None
 
-has_key = bool(os.environ.get("OPENAI_API_KEY", "").strip())
+has_key = provider_config["configured"]
 if not has_key:
-    st.info("尚未配置 AI 学习反馈服务。")
+    st.info(f"尚未配置 {provider_config['name']} AI 服务。")
 label = "重新生成" if st.session_state.learning_feedback else "生成 AI 学习反馈"
 if st.button(label, disabled=not has_key):
     st.session_state.learning_feedback_error = None

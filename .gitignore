@@ -7,3 +7,9 @@ __pycache__/
 math_ai.db
 math_ai.db-*
 .pytest_cache/
+data/raw_sources/
+tmp/
+*.db.bak
+*.db.backup
+reports/function_v2_dry_run_validation.json
+reports/function_v2_production_validation.json

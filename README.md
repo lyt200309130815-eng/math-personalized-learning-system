@@ -90,17 +90,21 @@ python -c "import json; from services.recommendation import generate_recommendat
 
 ## AI 个性化学习反馈
 
-侧栏“AI 学习反馈”先展示确定性数据，只有点击“生成 AI 学习反馈”或“重新生成”才调用官方 OpenAI Responses API。AI 只解释优势、待提升内容和已有推荐，不计算掌握度、正确率、等级，不决定推荐目标、题目或前置关系。文本仅作学习参考，约 250–450 中文字，包含五个固定部分。
+侧栏“AI 学习反馈”先展示确定性数据，只有点击“生成 AI 学习反馈”或“重新生成”才调用当前配置的大模型服务。AI 只解释优势、待提升内容和已有推荐，不计算掌握度、正确率、等级，不决定推荐目标、题目或前置关系。文本仅作学习参考，约 250–450 中文字，包含五个固定部分。
 
-配置环境变量 `OPENAI_API_KEY` 和可选的 `OPENAI_MODEL`。空白模板在 `.env.example`；默认模型集中定义为 `gpt-4.1-mini`。当前直接读取进程环境变量，不自动加载 `.env`，无需 python-dotenv。不要将真实密钥放入源码、文档或 Git。
+使用 `LLM_PROVIDER` 切换 `deepseek`（默认）与 `openai`，并保留已有 `gemini` 支持。DeepSeek 使用 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，默认 `deepseek-flash`；Gemini 使用 `GEMINI_API_KEY`、`GEMINI_MODEL`，默认 `gemini-3.8-flash`；OpenAI 使用 `OPENAI_API_KEY`、`OPENAI_MODEL`，保留默认 `gpt-4.1-mini`。模型集中定义在 `services/llm_provider.py`，模板在 `.env.example`。统一接口 `generate_text(prompt)` 隔离官方 SDK，未来可通过同一适配器接口扩展 provider；当前不实现 groq/ollama。当前直接读取进程环境变量，不自动加载 `.env`，无需 python-dotenv。不要将真实密钥放入源码、文档或 Git。
 
-没有密钥时显示“尚未配置 AI 学习反馈服务”，训练、画像和推荐仍可正常运行，并可点击“查看规则式学习反馈”。网络、超时或 API 错误时显示安全提示并使用规则反馈。请求超时 20 秒，SDK 自动重试关闭，避免隐式重复请求。
+没有当前 provider 的密钥时显示对应的“尚未配置 DeepSeek AI 服务。”等提示，训练、画像和推荐仍可正常运行，并可点击“查看规则式学习反馈”。网络、超时或 API 错误时显示安全提示并使用规则反馈。请求超时 20 秒，SDK 自动重试关闭，避免隐式重复请求。
 
-生成结果保存在会话中，普通 rerun 不调用 API；学情或推荐数据变化会清除旧结果，需再次明确点击生成。只发送必要的知识点指标和推荐摘要，不发送原始作答、SQL、数据库路径或密钥；使用 `store=False`。AI 输出不会写回数据库或确定性服务。
+生成结果保存在会话中，普通 rerun 不调用 API；学情、推荐数据、provider 或模型变化会清除旧结果，需再次明确点击生成。只发送必要的知识点指标和推荐摘要，不发送原始作答、SQL、数据库路径或密钥；OpenAI 请求使用 `store=False`。AI 输出不会写回数据库或确定性服务。
 
 测试通过 mock SDK 进行，不调用真实 API。安装依赖后启动：`python -m streamlit run app.py`。真实 API 验证请自行配置环境变量后手动点击按钮。
 
-实现参考：[官方 Python SDK](https://developers.openai.com/api/reference/python)、[GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini)。
+DeepSeek 复用 OpenAI SDK，连接 `https://api.deepseek.com`，调用 `chat.completions.create` 并读取 `choices[0].message.content`，不安装专用 SDK。只有手动运行 `python scripts/smoke_test_deepseek.py` 才进行连接冒烟测试，不自动运行。
+
+Gemini 使用 Google 官方 `google-genai` 的 `models.generate_content` 和 `response.text`；OpenAI 保留 Responses API 与 `output_text`。Gemini 显式从 `GEMINI_API_KEY` 读取密钥，避免其他 Google 环境变量覆盖。
+
+实现参考：[Google Gen AI SDK](https://googleapis.github.io/python-genai/)、[官方 Python SDK](https://developers.openai.com/api/reference/python)、[GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini)。
 
 ## 数据约定
 
@@ -115,3 +119,78 @@ python -c "import json; from services.recommendation import generate_recommendat
 前置关系：K001 无；K002 依赖 K001；K003 依赖 K001、K002；K004 依赖 K002、K003；K005 依赖 K003、K004。
 
 本地数据库可能包含学生信息，已加入 `.gitignore`。测试不访问真实数据库，不需要网络或凭据。后续阶段须单独明确授权。
+
+
+## V0.8B 本地题库候选审核
+
+原始资料位于 `data/raw_sources/function/`，DOCX 只读。提取器直接读取 DOCX 的 ZIP/XML，保守恢复分式、根式与上下标；无法可靠恢复的 OMML、图片和残缺题进入人工审核列表。无需新增依赖。
+
+第一批保留29道 `reviewed` 候选，知识点/难度/标签仍需教师核对，没有任何 `approved`。候选与待核列表分别位于 `data/question_bank/candidates/` 和 `data/question_bank/review_required/`；统计与来源定位见 `reports/question_import_batch_001.md`。
+
+```powershell
+# 首次生成限定第一批；若批次已存在会拒绝覆盖
+python scripts/extract_question_batch.py
+# 人工逐题审核：approve / reject / skip
+python scripts/review_question_batch.py data/question_bank/candidates/function_batch_001.jsonl
+# 全部离线自动测试
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+`validate_candidate()` 返回 errors、warnings 和 can_approve；结构检查通过不等于数学答案已被证明。人工批准必须核对原文、公式、答案解析、知识标签和难度；修订题干/选项/答案后需使用 `content_fingerprint()` 更新指纹。
+
+`import_questions(candidates, database_path=...)` 仅接受人工确认的 approved 题，必须显式指定隔离 SQLite 库，禁止写入真实 `math_ai.db`。其独立版本化题库支持指纹去重、事务回滚及幂等导入；`get_approved_questions()` 只返回 approved 题。当前训练、掌握度、推荐和反馈继续使用旧题库；15节点正式接入需另行验收迁移，不会将新 K005 奇偶性混同旧 K005 参数题。
+
+
+## V0.8C 金标准题人工审核
+
+第一批29道原候选是只读快照。V0.8D 已依据用户明确完成的人工审核生成29道 approved，审核身份为 manual_user；原候选仍为 reviewed 快照。
+
+```powershell
+python scripts/review_question_batch.py --reviewer "教师姓名"
+# 普通重启自动从尚未审核题继续；显式重看 skip 的题
+python scripts/review_question_batch.py --reviewer "教师姓名" --revisit-skipped
+# 只重建导出和统计，不进行审核
+python scripts/review_question_batch.py --prepare
+# 审核后导入自动创建、自动清理的临时 SQLite 并验收
+python scripts/verify_question_review.py
+```
+
+逐题显示原文、答案解析、来源定位、知识点、标签、难度与指纹。输入 a/r/s/q 分别批准、拒绝、跳过、保存退出。批准需要输入 confirm 明确核对数学 checklist；每项决定记录审核人、UTC 时间和备注。非 complete、校验错误或 warning 不能批准，本版不允许覆盖 warning。数学问题需要独立修订流程，本次不更改原候选内容。
+
+审核日志：`data/question_bank/reviews/function_batch_001_review.jsonl`。
+批准导出：`data/question_bank/approved/function_batch_001_approved.jsonl`。
+统计报告：`reports/question_review_batch_001.md`。
+
+审核日志绑定原候选 SHA-256，变更快照或篡改题目内容时拒绝恢复。每次决定先原子保存日志，再更新导出；导出中断可用 --prepare 重建。并发审核会被锁阻止；异常终止留下 .lock 时，应确认没有审核进程后再移除该锁。
+
+临时库验收保留旧题和已有虚拟 attempts；另建完全可丢弃的15节点验收投影，只放 approved 题，复用训练、掌握度、推荐、画像和规则反馈逻辑验证。15节点枚举适配仅在验收作用域内生效，真实应用仍使用原架构。未评估保持 None，related 标签不会重复计入证据；无题知识点显示暂无金标准题。K007 暂无金标准题，需要 Batch 002 定向补充，本阶段不处理第二批。
+
+
+## V0.8D Batch 001 批准与临时集成验收
+
+批准前29道全部通过 validator，ID和指纹唯一。批准导出及审核日志保留用户确认与审核时间，不代表 AI 再次审核。真实数据库尚未迁移。
+
+`python scripts/verify_question_review.py` 仅在临时库导入，首次 inserted=29，重复 inserted=0/skipped=29。沙盒适配只在离线验收作用域内生效：训练SQL显式限制 approved，掌握度仅统计 primary，旧 Q005/Q006 不进入新 K005；推荐检查 core 与 question prerequisite（None 或 <0.60 均不满足），优先未近期作答题，无题返回覆盖不足状态。真实应用仍使用原数据库和服务入口。
+
+覆盖分析见 `reports/question_bank_gap_after_batch_001.md`。门槛为每节点至少3道、至少1道难度1–2、至少1道难度2–3；难度2可同时满足两项。覆盖不足不改变学生掌握度。K007 当前0题，需要后续 Batch 002 定向补充；本阶段只分析缺口，没有处理第二批。
+
+
+## V0.9A function_v2 完整隔离演练
+
+三个已人工批准批次合计66道题，每个知识点至少3道。真实数据库仍使用 function_v1，未迁移或切换。演练结果见 `reports/function_v2_final_coverage_report.md` 和 `reports/function_v2_dry_run_validation.json`。
+
+`python scripts/function_v2_dry_run.py` 用 SQLite backup API 创建 `tmp/function_v2_dry_run.db`，只在副本执行新增版本表与66题导入，复用真实 mastery/recommendation 查询接口，验证历史映射、新学生、模拟训练和回退。为防止覆盖副本，该命令拒绝已存在的目标文件；迁移函数本身支持幂等重复执行。
+
+PowerShell 中可以启动隔离版本（只改变当前终端配置）：
+
+```powershell
+$env:MATH_AI_DATABASE_PATH = (Resolve-Path tmp/function_v2_dry_run.db).Path
+$env:ACTIVE_TAXONOMY_VERSION = "function_v2"
+python -m streamlit run app.py
+```
+
+切回旧版本用 `$env:ACTIVE_TAXONOMY_VERSION = "function_v1"`。恢复真实库路径用 `Remove-Item Env:MATH_AI_DATABASE_PATH`；生产默认仍为 function_v1。AI 请求只在明确点击按钮时发生，测试全部 mock，演练不发送真实 API 请求。
+
+版本化映射以关系表为事实来源。新增题在旧 questions 外键上使用 `function_v2:Kxxx` 兼容节点，其 topic 为 function_v2，不进入旧版本题池；不修改旧题正文、答案、旧外键及任何历史 attempts。新表提供15节点图、primary/related映射、题级前置、标签、来源和迁移审计。related 不计直接证据，新 K005 奇偶性不继承旧参数题分数。
+
+本阶段迁移函数明确禁止真实库路径。正式启用仍需用户另行授权对真实库进行受控迁移、复核原记录及备份，再设置 `ACTIVE_TAXONOMY_VERSION=function_v2`；不能仅设置版本变量而跳过数据库迁移。回退只需切回 function_v1，不删除新作答。

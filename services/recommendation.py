@@ -5,7 +5,9 @@ from pathlib import Path
 
 from database.database import (
     DATABASE_PATH, get_function_knowledge_points, get_questions_for_knowledge, get_recent_attempts,
+    get_question_prerequisites,
 )
+from settings import get_active_taxonomy_version
 from services.mastery import calculate_knowledge_mastery, calculate_student_mastery
 
 
@@ -47,15 +49,17 @@ def _priority(mastery: dict, depth: int = 0) -> tuple:
 
 
 def recommend_next_knowledge(
-    student_id: str, *, database_path: str | Path = DATABASE_PATH,
+    student_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> dict:
     """Choose a priority target, then recursively fall back to unmet prerequisites."""
-    results = calculate_student_mastery(student_id, database_path=database_path)
+    kwargs = {'database_path': database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version'] = taxonomy_version
+    results = calculate_student_mastery(student_id, **kwargs)
     if not results:
         raise ValueError("函数知识点尚未初始化。")
     mastery_by_id = {result["knowledge_point_id"]: result for result in results}
     prerequisites = {}
-    for point in get_function_knowledge_points(database_path=database_path):
+    for point in get_function_knowledge_points(**kwargs):
         keys = json.loads(point["prerequisite_ids"])
         if not isinstance(keys, list) or any(not isinstance(key, str) or key not in mastery_by_id for key in keys):
             raise ValueError(f"知识点 {point['id']} 的前置关系无效。")
@@ -109,11 +113,23 @@ def recommend_next_knowledge(
             "difficulty_range": list(get_difficulty_range(target))}
 
 
-def _select_questions(student_id: str, target: dict, limit: int, database_path: str | Path) -> list[dict]:
+def _select_questions(student_id: str, target: dict, limit: int, database_path, taxonomy_version=None) -> list[dict]:
     if not isinstance(limit, int) or isinstance(limit, bool) or limit < 0:
         raise ValueError("limit must be a nonnegative integer")
-    questions = get_questions_for_knowledge(target["knowledge_point_id"], database_path=database_path)
-    recent_ids = {row["question_id"] for row in get_recent_attempts(student_id, 10, database_path=database_path)}
+    kwargs = {'database_path': database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version'] = taxonomy_version
+    questions = get_questions_for_knowledge(target["knowledge_point_id"], **kwargs)
+    if (taxonomy_version or get_active_taxonomy_version()) == 'function_v2':
+        mastery = {p['knowledge_point_id']:p for p in calculate_student_mastery(student_id, **kwargs)}
+        points = get_function_knowledge_points(**kwargs)
+        graph = {p['id']:json.loads(p['prerequisite_ids']) for p in points}
+        def ready(key, trail=()):
+            if key in trail: raise ValueError('前置关系存在循环。')
+            score = mastery[key]['mastery_score']
+            return score is not None and score>=0.60 and all(ready(p,trail+(key,)) for p in graph[key])
+        if any(not ready(p) for p in graph[target['knowledge_point_id']]): return []
+        questions = [q for q in questions if all(ready(p) for p in get_question_prerequisites(q['id'], 'function_v2', database_path=database_path))]
+    recent_ids = {row["question_id"] for row in get_recent_attempts(student_id, 10, **kwargs)}
     low, high = get_difficulty_range(target)
 
     def sort_key(question: dict) -> tuple:
@@ -127,17 +143,34 @@ def _select_questions(student_id: str, target: dict, limit: int, database_path: 
 
 
 def recommend_questions(
-    student_id: str, knowledge_point_id: str, limit: int = 5, *, database_path: str | Path = DATABASE_PATH,
+    student_id: str, knowledge_point_id: str, limit: int = 5, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> list[dict]:
     """Select unique previews for a given point; new questions precede recent ones."""
-    target = calculate_knowledge_mastery(student_id, knowledge_point_id, database_path=database_path)
-    return _select_questions(student_id, target, limit, database_path)
+    kwargs={'database_path':database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version']=taxonomy_version
+    target = calculate_knowledge_mastery(student_id, knowledge_point_id, **kwargs)
+    return _select_questions(student_id, target, limit, database_path, taxonomy_version)
 
 
 def generate_recommendation(
-    student_id: str, limit: int = 5, *, database_path: str | Path = DATABASE_PATH,
+    student_id: str, limit: int = 5, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> dict:
     """Return a prerequisite-safe target and practice previews, without writing data."""
-    target = recommend_next_knowledge(student_id, database_path=database_path)
-    return {"student_id": student_id, "target_knowledge": target,
-            "recommended_questions": _select_questions(student_id, target, limit, database_path)}
+    kwargs={'database_path':database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version']=taxonomy_version
+    target = recommend_next_knowledge(student_id, **kwargs)
+    questions = _select_questions(student_id, target, limit, database_path, taxonomy_version)
+    result = {"student_id": student_id, "target_knowledge": target, "recommended_questions": questions}
+    if (taxonomy_version or get_active_taxonomy_version())=='function_v2':
+        if not questions and limit>0:
+            for alternative in sorted(calculate_student_mastery(student_id, **kwargs),key=_priority):
+                eligible=_select_questions(student_id,alternative,limit,database_path,taxonomy_version)
+                if eligible:
+                    result['target_knowledge']={**alternative,'recommendation_type':get_recommendation_type(alternative),
+                        'difficulty_range':list(get_difficulty_range(alternative)),
+                        'reason':f"{target['knowledge_point_name']}当前缺少满足前置条件的已审核练习；先进行{alternative['knowledge_point_name']}的{get_recommendation_type(alternative)}训练。"}
+                    result['recommended_questions']=eligible
+                    break
+        result['status']='ready' if result['recommended_questions'] else 'insufficient_eligible_questions'
+        result['message']='可以开始训练。' if result['recommended_questions'] else '暂缺满足前置条件的已审核练习，请先完成必要基础训练。'
+    return result

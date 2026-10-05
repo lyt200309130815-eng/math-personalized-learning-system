@@ -12,10 +12,11 @@ import httpx
 from openai import APIConnectionError
 from streamlit.testing.v1 import AppTest
 
+from services.llm_provider import DEFAULT_OPENAI_MODEL
 from database.database import record_attempt
 from init_db import initialize_database
 from services.feedback import (
-    AIFeedbackUnavailable, DEFAULT_OPENAI_MODEL, FEEDBACK_HEADINGS, FEEDBACK_INSTRUCTIONS,
+    AIFeedbackUnavailable, FEEDBACK_HEADINGS, FEEDBACK_INSTRUCTIONS,
     build_feedback_context, build_rule_based_feedback, generate_learning_feedback,
 )
 
@@ -26,7 +27,7 @@ class FeedbackTests(unittest.TestCase):
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"
         initialize_database(self.path)
-        environment = patch.dict(os.environ, {"OPENAI_API_KEY": "", "OPENAI_MODEL": ""})
+        environment = patch.dict(os.environ, {"LLM_PROVIDER": "openai", "OPENAI_API_KEY": "", "OPENAI_MODEL": "", "GEMINI_API_KEY": ""})
         environment.start()
         self.addCleanup(environment.stop)
         self.root = Path(__file__).resolve().parents[1]
@@ -67,14 +68,16 @@ class FeedbackTests(unittest.TestCase):
         expected = build_rule_based_feedback(context)
         factory, client = self.sdk(expected)
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder"}), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             text = generate_learning_feedback("S001", context=context)
         self.assertEqual(text, expected)
         self.assertEqual(context, before_context)
         self.assertEqual(self.path.read_bytes(), before_database)
         client.responses.create.assert_called_once()
         arguments = client.responses.create.call_args.kwargs
-        self.assertEqual(json.loads(arguments["input"]), context)
+        sent = json.loads(arguments["input"].split("学情数据 JSON：\n", 1)[1])
+        self.assertEqual(sent, {key:value for key,value in context.items() if key!='student_id'})
+        self.assertNotIn('S001', arguments['input'])
         self.assertFalse(arguments["store"])
         self.assertEqual(arguments["model"], DEFAULT_OPENAI_MODEL)
         self.assertEqual(factory.call_args.kwargs, {"timeout": 20.0, "max_retries": 0})
@@ -82,20 +85,21 @@ class FeedbackTests(unittest.TestCase):
     def test_main_interface_reads_mastery_and_recommendation(self) -> None:
         factory, client = self.sdk()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder"}), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             generate_learning_feedback("S001", database_path=self.path)
-        self.assertEqual(json.loads(client.responses.create.call_args.kwargs["input"]), self.context())
+        self.assertEqual(json.loads(client.responses.create.call_args.kwargs["input"].split("学情数据 JSON：\n", 1)[1]),
+                         {key:value for key,value in self.context().items() if key!='student_id'})
 
     def test_model_environment_override(self) -> None:
         factory, client = self.sdk()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder", "OPENAI_MODEL": "test-model"}), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             generate_learning_feedback("S001", context=self.context())
         self.assertEqual(client.responses.create.call_args.kwargs["model"], "test-model")
 
     def test_missing_key_never_constructs_client(self) -> None:
-        with patch("services.feedback.OpenAI") as factory:
-            with self.assertRaisesRegex(AIFeedbackUnavailable, "尚未配置 AI 学习反馈服务"):
+        with patch("services.llm_provider.OpenAI") as factory:
+            with self.assertRaisesRegex(AIFeedbackUnavailable, "尚未配置 OpenAI AI 服务"):
                 generate_learning_feedback("S001", database_path=self.path)
         factory.assert_not_called()
 
@@ -104,7 +108,7 @@ class FeedbackTests(unittest.TestCase):
         client.responses.create.side_effect = APIConnectionError(
             message="private internal diagnostic", request=httpx.Request("POST", "https://example.invalid"))
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder"}), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             with self.assertRaises(AIFeedbackUnavailable) as caught:
                 generate_learning_feedback("S001", context=self.context())
         self.assertEqual(str(caught.exception), "AI学习反馈暂时不可用，请稍后重试。")
@@ -113,7 +117,7 @@ class FeedbackTests(unittest.TestCase):
     def test_empty_or_malformed_output_is_unavailable(self) -> None:
         factory, client = self.sdk()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder"}), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             for text in ("", "no required sections"):
                 client.responses.create.return_value.output_text = text
                 with self.assertRaises(AIFeedbackUnavailable):
@@ -138,7 +142,7 @@ class FeedbackTests(unittest.TestCase):
 
     def test_page_no_key_and_rule_fallback_never_calls_sdk(self) -> None:
         with patch("services.feedback.build_feedback_context", side_effect=lambda _: self.context()), \
-                patch("services.feedback.OpenAI") as factory:
+                patch("services.llm_provider.OpenAI") as factory:
             app = AppTest.from_file(str(self.root / "pages" / "feedback.py")).run()
             self.assertEqual(len(app.exception), 0)
             self.assertIn("尚未配置", app.info[0].value)
@@ -152,7 +156,7 @@ class FeedbackTests(unittest.TestCase):
         factory, client = self.sdk()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-placeholder"}), \
                 patch("services.feedback.build_feedback_context", side_effect=lambda _: self.context()), \
-                patch("services.feedback.OpenAI", factory):
+                patch("services.llm_provider.OpenAI", factory):
             app = AppTest.from_file(str(self.root / "pages" / "feedback.py")).run()
             client.responses.create.assert_not_called()
             app.button[0].click().run()

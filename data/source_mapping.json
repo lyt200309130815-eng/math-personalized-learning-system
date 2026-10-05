@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "taxonomy_version": "function_v2",
+  "status": "draft",
+  "topic": "函数",
+  "scope": "function_v2 设计及本地 DOCX 来源映射；V0.8B 仅提取第一批候选，不迁移真实数据库。",
+  "limitations": [
+    "本地15份 DOCX 已作第一批有限提取，每份最多检查12个单项选择题候选，不代表全文审核。",
+    "知识点、标签和难度标注仍待教师逐题核对，候选题未批准。",
+    "旧种子题映射仍为迁移草案，历史 attempts 保持不变。"
+  ],
+  "knowledge_points": [
+    {
+      "id": "K001",
+      "name": "函数概念与三要素",
+      "prerequisite_ids": []
+    },
+    {
+      "id": "K002",
+      "name": "定义域、值域与函数表示",
+      "prerequisite_ids": [
+        "K001"
+      ]
+    },
+    {
+      "id": "K003",
+      "name": "函数单调性",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K004",
+      "name": "函数最值",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K005",
+      "name": "函数奇偶性",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K006",
+      "name": "周期性与对称性",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K007",
+      "name": "二次函数",
+      "prerequisite_ids": [
+        "K001",
+        "K002"
+      ]
+    },
+    {
+      "id": "K008",
+      "name": "幂函数",
+      "prerequisite_ids": [
+        "K001",
+        "K002"
+      ]
+    },
+    {
+      "id": "K009",
+      "name": "指数与指数函数",
+      "prerequisite_ids": [
+        "K001",
+        "K002"
+      ]
+    },
+    {
+      "id": "K010",
+      "name": "对数与对数函数",
+      "prerequisite_ids": [
+        "K002",
+        "K009"
+      ]
+    },
+    {
+      "id": "K011",
+      "name": "指数、对数、幂大小比较",
+      "prerequisite_ids": [
+        "K008",
+        "K009",
+        "K010"
+      ]
+    },
+    {
+      "id": "K012",
+      "name": "函数图象与图象变换",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K013",
+      "name": "函数零点与方程",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    },
+    {
+      "id": "K014",
+      "name": "函数与方程综合",
+      "prerequisite_ids": [
+        "K013"
+      ]
+    },
+    {
+      "id": "K015",
+      "name": "函数模型应用",
+      "prerequisite_ids": [
+        "K002"
+      ]
+    }
+  ],
+  "ability_tags": [
+    "concept_understanding",
+    "calculation",
+    "logical_reasoning",
+    "graph_analysis",
+    "classification_discussion",
+    "parameter_analysis",
+    "modeling"
+  ],
+  "method_tags": [
+    "definition",
+    "substitution",
+    "monotonicity",
+    "symmetry",
+    "special_value",
+    "intermediate_value",
+    "graph_transform",
+    "zero_analysis",
+    "bisection",
+    "function_model"
+  ],
+  "sources": [
+    {
+      "source_id": "function_docx_01",
+      "title": "第二章　§2.10　函数的零点与方程的解",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K013"
+      ],
+      "sha256": "7da9bcec0a87e2c967224ca7ddab30c91eb45feb64b580942293fc9a92808b12",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_02",
+      "title": "第二章　§2.11　函数与方程的综合应用",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.11　函数与方程的综合应用.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K014"
+      ],
+      "sha256": "7b1851320c542276a55bb3d4b6ab48c9f5e4effdf12980cb5cb95b9ae125d796",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_03",
+      "title": "第二章　§2.12　函数模型的应用",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K015"
+      ],
+      "sha256": "c0572c0a6b8e21e851bf0fa393f9e3792e048cf9774176514d12df2c03d555d7",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_04",
+      "title": "第二章　§2.1　函数的概念及其表示",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K001",
+        "K002"
+      ],
+      "sha256": "bfae8dfc6e13ba99cb9fbdb0e2a12574832dae6410fe637d5e24353e2a7730a1",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_05",
+      "title": "第二章　§2.2　函数的单调性与最值",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.2　函数的单调性与最值.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K003",
+        "K004"
+      ],
+      "sha256": "4a4da4a043a4a5f8afa3779129d634179d1dad121b475e710a0733c1cb0f34fb",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_06",
+      "title": "第二章　§2.3　函数的奇偶性",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K005"
+      ],
+      "sha256": "2b98749942d46405dc0feb9ed1acfc75b54a012461b9fd5891e462e26657f25e",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_07",
+      "title": "第二章　§2.4　函数的周期性和对称性",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.4　函数的周期性和对称性.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K006"
+      ],
+      "sha256": "25d7a7bc92d4bc1b26b7b8da5051d6538bd27288a37b004ba4235b042f40b32f",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_08",
+      "title": "第二章　§2.5　二次函数与幂函数",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.5　二次函数与幂函数.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K007",
+        "K008"
+      ],
+      "sha256": "f3e07be2e9eb04b2560d04dfa55eae9b881bcf6b1a2087c16269f81e846ee462",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_09",
+      "title": "第二章　§2.6　指数与指数函数",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K009"
+      ],
+      "sha256": "ec6f7661553cca7157518fc1cf4a9380542f8134559850d06c43bcbe2eb65b0e",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_10",
+      "title": "第二章　§2.7　对数与对数函数",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K010"
+      ],
+      "sha256": "4e670ab7e922a6620ab14b5ad2aeb1b90cfc2e4a96ce6e02f27dd7d3508f9568",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_11",
+      "title": "第二章　§2.8　指、对、幂的大小比较",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.8　指、对、幂的大小比较.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K011"
+      ],
+      "sha256": "ea22337bf55865e6c0c65c7f8fad4c96ccc2d3c0bd685c92184706145255a550",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_12",
+      "title": "第二章　§2.9　函数的图象",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K012"
+      ],
+      "sha256": "6dcbe9321d132aa6947b40f4f1faf8fa5ae8555fb0608b50324cf7e0799557aa",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_13",
+      "title": "第二章　必刷小题2　函数的概念与性质",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　必刷小题2　函数的概念与性质.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K001",
+        "K002",
+        "K003",
+        "K004",
+        "K005",
+        "K006"
+      ],
+      "sha256": "8a3090a0ac7a0b0ea1eb450da245b9f84fa595720e72110c6519840779682806",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_14",
+      "title": "第二章　必刷小题3　基本初等函数",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　必刷小题3　基本初等函数.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K007",
+        "K008",
+        "K009",
+        "K010",
+        "K011",
+        "K012"
+      ],
+      "sha256": "e787e0fd585e547b1af86d7e786b3f1449f337a3875adc1e700bbca67406f78d",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "function_docx_15",
+      "title": "第二章　必刷小题4　函数与方程",
+      "source_kind": "repository_docx",
+      "file_path": "data/raw_sources/function/第二章　必刷小题4　函数与方程.docx",
+      "locator": "word/document.xml paragraph indices (see candidate source_locator)",
+      "knowledge_point_ids": [
+        "K013",
+        "K014",
+        "K015"
+      ],
+      "sha256": "99072ea99402992bc6be081a93f1d037d79b6498ee8133aa688339e08c43d4e5",
+      "review_status": "bounded_extraction_pending_teacher",
+      "version": null
+    },
+    {
+      "source_id": "repository_seed_csv",
+      "title": "现有函数种子题库",
+      "source_kind": "repository_file",
+      "file_path": "data/questions.csv",
+      "locator": "题号 Q001–Q006",
+      "source_version": "function_v1_seed",
+      "review_status": "repository_inspected_mapping_pending_teacher",
+      "knowledge_point_ids": [
+        "K001",
+        "K002",
+        "K003",
+        "K004",
+        "K007"
+      ],
+      "question_mappings": [
+        {
+          "question_id": "Q001",
+          "legacy_knowledge_point_id": "K001",
+          "primary_knowledge_point_id": "K001",
+          "related_knowledge_point_ids": [],
+          "additional_prerequisite_ids": [],
+          "ability_tags": [
+            "concept_understanding",
+            "logical_reasoning"
+          ],
+          "method_tags": [
+            "definition",
+            "special_value"
+          ],
+          "review_status": "draft"
+        },
+        {
+          "question_id": "Q002",
+          "legacy_knowledge_point_id": "K002",
+          "primary_knowledge_point_id": "K002",
+          "related_knowledge_point_ids": [
+            "K001"
+          ],
+          "additional_prerequisite_ids": [],
+          "ability_tags": [
+            "calculation",
+            "logical_reasoning"
+          ],
+          "method_tags": [
+            "definition"
+          ],
+          "review_status": "draft"
+        },
+        {
+          "question_id": "Q003",
+          "legacy_knowledge_point_id": "K003",
+          "primary_knowledge_point_id": "K003",
+          "related_knowledge_point_ids": [
+            "K007"
+          ],
+          "additional_prerequisite_ids": [
+            "K007"
+          ],
+          "ability_tags": [
+            "graph_analysis",
+            "logical_reasoning"
+          ],
+          "method_tags": [
+            "monotonicity",
+            "symmetry"
+          ],
+          "review_status": "draft"
+        },
+        {
+          "question_id": "Q004",
+          "legacy_knowledge_point_id": "K004",
+          "primary_knowledge_point_id": "K004",
+          "related_knowledge_point_ids": [
+            "K007"
+          ],
+          "additional_prerequisite_ids": [
+            "K007"
+          ],
+          "ability_tags": [
+            "calculation",
+            "logical_reasoning"
+          ],
+          "method_tags": [
+            "substitution",
+            "monotonicity",
+            "special_value"
+          ],
+          "review_status": "draft"
+        },
+        {
+          "question_id": "Q005",
+          "legacy_knowledge_point_id": "K005",
+          "primary_knowledge_point_id": "K003",
+          "related_knowledge_point_ids": [
+            "K007"
+          ],
+          "additional_prerequisite_ids": [
+            "K007"
+          ],
+          "ability_tags": [
+            "parameter_analysis",
+            "logical_reasoning",
+            "graph_analysis"
+          ],
+          "method_tags": [
+            "monotonicity",
+            "symmetry"
+          ],
+          "review_status": "draft"
+        },
+        {
+          "question_id": "Q006",
+          "legacy_knowledge_point_id": "K005",
+          "primary_knowledge_point_id": "K004",
+          "related_knowledge_point_ids": [
+            "K007"
+          ],
+          "additional_prerequisite_ids": [
+            "K007"
+          ],
+          "ability_tags": [
+            "parameter_analysis",
+            "logical_reasoning",
+            "calculation"
+          ],
+          "method_tags": [
+            "substitution",
+            "monotonicity",
+            "special_value"
+          ],
+          "review_status": "draft"
+        }
+      ]
+    }
+  ],
+  "unmapped_knowledge_point_ids": [
+    "K006",
+    "K007",
+    "K008",
+    "K009",
+    "K010",
+    "K011",
+    "K012",
+    "K013",
+    "K014",
+    "K015"
+  ],
+  "unmapped_scope": "尚未获得用户原始资料来源的核心节点；K007 仅有旧种子题中的相关标签，不表示原始资料已到位或有主测题。",
+  "knowledge_points_without_primary_seed_questions": [
+    "K005",
+    "K006",
+    "K007",
+    "K008",
+    "K009",
+    "K010",
+    "K011",
+    "K012",
+    "K013",
+    "K014",
+    "K015"
+  ],
+  "migration_policy": {
+    "execute": false,
+    "legacy_taxonomy_version": "function_v1",
+    "preserve_attempts": true,
+    "preserve_legacy_question_fields": true,
+    "id_identity": [
+      "taxonomy_version",
+      "knowledge_point_id"
+    ],
+    "legacy_k005_policy": "逐题重映射为主知识点并保留 parameter_analysis，禁止直接映射新 K005。"
+  },
+  "prerequisite_policy": {
+    "core": "仅表示进入该知识点学习所必需的基础，用于知识路径回退；不要求先掌握该节点全部典型解法。",
+    "question": "仅对具体题目筛选已验证的必要背景；不能作为整个知识点的全局前置。",
+    "primary_target": "不得把题目主要考查节点自身或依赖该节点的后继作为该题入门训练的前置；相关标签不自动成为前置。",
+    "entry_training": "每个开放节点须有只依赖已完成核心前置的已审核入门诊断题；题库缺口不等于图循环，缺题节点暂不开放。",
+    "availability_validation": "图结构已可验证；实际题库仍只有6题，不能据此断言15节点已经具备可训练题目。"
+  },
+  "question_prerequisite_rules": [
+    {
+      "target_knowledge_point_id": "K004",
+      "condition": "以单调性求最值",
+      "additional_prerequisite_ids": [
+        "K003"
+      ]
+    },
+    {
+      "target_knowledge_point_id": "K006",
+      "condition": "使用奇偶性推导周期或对称性质",
+      "additional_prerequisite_ids": [
+        "K005"
+      ]
+    },
+    {
+      "target_knowledge_point_id": "K007",
+      "condition": "考查二次函数单调性/最值的综合应用",
+      "additional_prerequisite_ids": [
+        "K003",
+        "K004"
+      ],
+      "note": "按实际解法只选择必要项；基础配方/顶点识别不加这两项。"
+    },
+    {
+      "target_knowledge_point_id": "K008",
+      "condition": "幂函数单调性或奇偶性专项",
+      "additional_prerequisite_ids": [
+        "K003",
+        "K005"
+      ],
+      "note": "单调性题只需K003，奇偶性题只需K005，不统一强制两项。"
+    },
+    {
+      "target_knowledge_point_id": "K009",
+      "condition": "依赖单调性证明或比较",
+      "additional_prerequisite_ids": [
+        "K003"
+      ]
+    },
+    {
+      "target_knowledge_point_id": "K010",
+      "condition": "依赖单调性证明或比较",
+      "additional_prerequisite_ids": [
+        "K003"
+      ]
+    },
+    {
+      "target_knowledge_point_id": "K011",
+      "condition": "用函数单调性进行大小比较",
+      "additional_prerequisite_ids": [
+        "K003"
+      ]
+    },
+    {
+      "target_knowledge_point_id": "K012",
+      "condition": "使用奇偶性或周期/对称关系分析图象",
+      "additional_prerequisite_ids": [
+        "K005",
+        "K006"
+      ],
+      "note": "按题取必要项，不对所有对称图象题强制两项。"
+    },
+    {
+      "target_knowledge_point_id": "K013",
+      "condition": "使用单调性证明零点唯一性或图象交点分析",
+      "additional_prerequisite_ids": [
+        "K003",
+        "K012"
+      ],
+      "note": "分别按方法取必要项；基础零点对应方程不需要这些方法。"
+    },
+    {
+      "target_knowledge_point_id": "K014",
+      "condition": "涉及单调性、最值、图象或特定函数族的综合题",
+      "additional_prerequisite_ids": [
+        "K003",
+        "K004",
+        "K012"
+      ],
+      "note": "逐题选择；二次、幂、指数、对数背景再按题添加K007/K008/K009/K010，不一律要求。"
+    },
+    {
+      "target_knowledge_point_id": "K015",
+      "condition": "最优化、二次模型或指数增长模型",
+      "additional_prerequisite_ids": [
+        "K004",
+        "K007",
+        "K009"
+      ],
+      "note": "按具体模型选择必要项；分段计费等基础应用不强制这些项。"
+    }
+  ]
+}

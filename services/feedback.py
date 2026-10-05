@@ -1,10 +1,9 @@
 """Read-only explanations of deterministic learning results, with offline fallback."""
 
 import json
-import os
 from pathlib import Path
 
-from openai import OpenAI, OpenAIError
+from services.llm_provider import LLMUnavailable, generate_text
 
 from database.database import DATABASE_PATH
 from services.mastery import calculate_student_mastery
@@ -12,7 +11,6 @@ from services.profile import format_percentage
 from services.recommendation import generate_recommendation
 
 
-DEFAULT_OPENAI_MODEL = "gpt-4.1-mini"
 FEEDBACK_HEADINGS = (
     "本次学习表现", "当前优势", "当前需要重点提升的内容",
     "为什么推荐下一步训练", "下一步学习建议",
@@ -36,14 +34,15 @@ evidence_level 为数据较少时，即使 mastery_score=1，也不得声称完�
 """
 
 
-class AIFeedbackUnavailable(RuntimeError):
-    """Safe, identifiable configuration or API failure for student-facing handling."""
+AIFeedbackUnavailable = LLMUnavailable
 
 
-def build_feedback_context(student_id: str, *, database_path: str | Path = DATABASE_PATH) -> dict:
+def build_feedback_context(student_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None) -> dict:
     """Whitelist only necessary learning metrics; do not send raw records or private configuration."""
-    mastery = calculate_student_mastery(student_id, database_path=database_path)
-    recommendation = generate_recommendation(student_id, database_path=database_path)
+    kwargs={'database_path':database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version']=taxonomy_version
+    mastery = calculate_student_mastery(student_id, **kwargs)
+    recommendation = generate_recommendation(student_id, **kwargs)
     fields = ("knowledge_point_id", "knowledge_point_name", "mastery_score", "mastery_level",
               "attempt_count", "correct_count", "evidence_level", "overall_accuracy",
               "recent_accuracy", "stability", "difficulty_performance")
@@ -93,25 +92,16 @@ def build_rule_based_feedback(context: dict) -> str:
 
 
 def generate_learning_feedback(
-    student_id: str, *, database_path: str | Path = DATABASE_PATH, context: dict | None = None,
+    student_id: str, *, database_path: str | Path | None = None, context: dict | None = None,
 ) -> str:
     """Make exactly one SDK request; only return explanatory text, never apply it to data."""
-    if not os.environ.get("OPENAI_API_KEY", "").strip():
-        raise AIFeedbackUnavailable("尚未配置 AI 学习反馈服务。")
     if context is None:
         context = build_feedback_context(student_id, database_path=database_path)
     if context["student_id"] != student_id:
         raise ValueError("Feedback context belongs to another student")
-    model = os.environ.get("OPENAI_MODEL", "").strip() or DEFAULT_OPENAI_MODEL
-    try:
-        with OpenAI(timeout=20.0, max_retries=0) as client:
-            response = client.responses.create(
-                model=model, instructions=FEEDBACK_INSTRUCTIONS,
-                input=json.dumps(context, ensure_ascii=False), max_output_tokens=1000, store=False,
-            )
-            text = response.output_text.strip()
-    except OpenAIError:
-        raise AIFeedbackUnavailable("AI学习反馈暂时不可用，请稍后重试。") from None
+    public_context = {key:value for key,value in context.items() if key!='student_id'}
+    prompt = FEEDBACK_INSTRUCTIONS + "\n学情数据 JSON：\n" + json.dumps(public_context, ensure_ascii=False)
+    text = generate_text(prompt)
     if not text or not all(heading in text for heading in FEEDBACK_HEADINGS):
         raise AIFeedbackUnavailable("AI学习反馈暂时不可用，请稍后重试。")
     return text

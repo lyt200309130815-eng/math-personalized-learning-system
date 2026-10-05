@@ -35,17 +35,19 @@ def get_evidence_level(attempt_count: int) -> str:
 
 
 def calculate_knowledge_mastery(
-    student_id: str, knowledge_point_id: str, *, database_path: str | Path = DATABASE_PATH,
+    student_id: str, knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> dict:
     """Return all evidence and metrics for one point; never persist derived scores.
 
     R and S use the newest five records by created_at (ID breaks ties).
     Unknown knowledge IDs raise ValueError rather than masquerading as untrained points.
     """
-    point = get_knowledge_point(knowledge_point_id, database_path=database_path)
+    kwargs = {'database_path': database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version'] = taxonomy_version
+    point = get_knowledge_point(knowledge_point_id, **kwargs)
     if point is None:
         raise ValueError(f"Unknown knowledge point: {knowledge_point_id}")
-    attempts = get_knowledge_attempts(student_id, knowledge_point_id, database_path=database_path)
+    attempts = get_knowledge_attempts(student_id, knowledge_point_id, **kwargs)
     count = len(attempts)
     correct_count = sum(row["is_correct"] for row in attempts)
     result = {
@@ -74,8 +76,10 @@ def calculate_knowledge_mastery(
 
 
 def calculate_student_mastery(
-    student_id: str, *, database_path: str | Path = DATABASE_PATH,
+    student_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> list[dict]:
-    """Return K001–K005 in ID order, retaining points with no training evidence."""
-    return [calculate_knowledge_mastery(student_id, point["id"], database_path=database_path)
-            for point in get_function_knowledge_points(database_path=database_path)]
+    """Return all configured taxonomy points, retaining those without evidence."""
+    kwargs = {'database_path': database_path}
+    if taxonomy_version is not None: kwargs['taxonomy_version'] = taxonomy_version
+    return [calculate_knowledge_mastery(student_id, point["id"], **kwargs)
+            for point in get_function_knowledge_points(**kwargs)]

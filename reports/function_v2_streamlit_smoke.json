@@ -1,0 +1,6 @@
+{
+  "taxonomy_version": "function_v2",
+  "database": "isolated dry-run copy",
+  "health_status": 200,
+  "real_api_called": false
+}

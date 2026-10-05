@@ -6,6 +6,7 @@ import streamlit as st
 
 from database.database import get_training_questions
 from services.training import advance_question, initialize_training_state, submit_training_answer
+from settings import get_active_taxonomy_version, get_database_path
 
 
 def submit_answer(question_id: str, correct_answer: str) -> None:
@@ -33,6 +34,11 @@ if not questions:
     st.info("暂无函数专题选择题，请先初始化题库。")
     st.stop()
 
+context = (get_active_taxonomy_version(), str(get_database_path()))
+if st.session_state.get('training_context') != context:
+    for key in ('question_index','selected_answer','submitted','feedback','recorded_attempt_id','answer_time','question_started_at'):
+        st.session_state.pop(key,None)
+    st.session_state.training_context = context
 initialize_training_state(st.session_state)
 
 question = questions[st.session_state.question_index % len(questions)]
@@ -52,6 +58,9 @@ if st.session_state.submitted:
         st.error(st.session_state.feedback)
     st.text(f"正确答案：{question['answer']}. {question['options'][question['answer']]}")
     st.write(f"知识点：{question['knowledge_point_name']}；难度：{question['difficulty']}/5")
+    if question.get("explanation"):
+        with st.expander("查看解析"):
+            st.text(question["explanation"])
     st.caption("本次答题已记录")
 elif st.session_state.feedback:
     st.warning(st.session_state.feedback)

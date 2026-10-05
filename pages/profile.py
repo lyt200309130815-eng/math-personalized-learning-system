@@ -6,10 +6,13 @@ import streamlit as st
 
 from services.mastery import calculate_student_mastery
 from services.profile import build_profile_data
+from settings import get_active_taxonomy_version
 
 
 st.title("高中数学智能训练系统")
 st.header("知识画像")
+if get_active_taxonomy_version()=='function_v2':
+    st.subheader('函数学习画像')
 st.write("当前学生：S001")
 st.write("当前专题：函数")
 st.caption("知识画像根据历史训练数据动态计算，仅作为学习诊断参考。")
@@ -38,7 +41,16 @@ if profile["unevaluated"]:
     st.caption("未训练不等于掌握度为 0；未评估知识点不绘制为零分。")
 
 st.subheader("知识点画像")
+group_names = {'K001':'基础概念','K002':'基础概念',
+               **{f'K{i:03d}':'函数性质' for i in range(3,7)},
+               **{f'K{i:03d}':'基本初等函数' for i in range(7,12)},
+               **{f'K{i:03d}':'函数综合应用' for i in range(12,16)}}
+previous_group = None
 for point in profile["points"]:
+    if get_active_taxonomy_version()=='function_v2':
+        group = group_names[point['knowledge_point_id']]
+        if group!=previous_group: st.subheader(group)
+        previous_group=group
     st.markdown(f"### {point['knowledge_point_id']} {point['knowledge_point_name']}")
     st.write(f"掌握度：{point['mastery_display']}；掌握等级：{point['mastery_level']}")
     st.write(f"训练次数：{point['attempt_count']}；正确次数：{point['correct_count']}；证据量：{point['evidence_level']}")
