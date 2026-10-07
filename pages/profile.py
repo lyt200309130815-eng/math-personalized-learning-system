@@ -13,12 +13,14 @@ st.title("高中数学智能训练系统")
 st.header("知识画像")
 if get_active_taxonomy_version()=='function_v2':
     st.subheader('函数学习画像')
-st.write("当前学生：S001")
+student_id = st.session_state.get("student_id", "S001")
+st.write(f"当前学生：{student_id}")
 st.write("当前专题：函数")
 st.caption("知识画像根据历史训练数据动态计算，仅作为学习诊断参考。")
 
 try:
-    profile = build_profile_data(calculate_student_mastery("S001"))
+    from database.training_review import pending_counts
+    profile = build_profile_data(calculate_student_mastery(student_id),pending_by_point=pending_counts(student_id,taxonomy_version=get_active_taxonomy_version()))
 except (sqlite3.Error, ValueError, FileNotFoundError):
     st.error("知识画像读取失败，请稍后重试；首次使用请先运行 python init_db.py。")
     st.stop()
@@ -28,8 +30,9 @@ st.subheader("总体概览")
 columns = st.columns(4)
 columns[0].metric("已训练知识点", f"{overview['trained_count']} / {overview['knowledge_point_count']}")
 columns[1].metric("未评估知识点", str(overview["unevaluated_count"]))
-columns[2].metric("累计答题次数", f"{overview['total_attempts']} 次")
+columns[2].metric("有效评分证据", f"{overview['total_attempts']} 次")
 columns[3].metric("总体正确率", overview["overall_accuracy_display"])
+st.caption(f"待评阅作答：{overview['pending_total']}次，暂不计入掌握度。")
 if overview["total_attempts"] == 0:
     st.info("暂无训练数据")
 
@@ -54,6 +57,7 @@ for point in profile["points"]:
     st.markdown(f"### {point['knowledge_point_id']} {point['knowledge_point_name']}")
     st.write(f"掌握度：{point['mastery_display']}；掌握等级：{point['mastery_level']}")
     st.write(f"训练次数：{point['attempt_count']}；正确次数：{point['correct_count']}；证据量：{point['evidence_level']}")
+    st.write(f"有效评分证据：{point['attempt_count']}次；待评阅大题：{point['pending_subjective_count']}次；待人工审核填空：{point['pending_fill_blank_count']}次")
     if point["evidence_note"]:
         st.info(point["evidence_note"])
     with st.expander(f"查看 {point['knowledge_point_name']} 的详细指标"):

@@ -1,0 +1,172 @@
+{
+  "stage": "V1.0D.4",
+  "result": "passed",
+  "browser": "Microsoft Edge headless / real Streamlit HTTP",
+  "isolated_database": "E:\\Projects\\math_ai\\tmp\\v1_0d_4_browser_20261006T180012\\browser.db",
+  "diagnostic_mix": {
+    "single_choice": 6,
+    "fill_blank": 7,
+    "multiple_choice": 2,
+    "subjective": 3
+  },
+  "adaptive_mix": {
+    "single_choice": 4,
+    "fill_blank": 2,
+    "subjective": 4
+  },
+  "diagnostic": [
+    {
+      "question_id": "FC-10fd3ba793bf472e",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-83cc71923a0e2bf6",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FM-00e0f8049c41c3db",
+      "question_type": "multiple_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FS-3b89764fc778ddb3",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FF-9f6ffa3bee016a63",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "Q-ORG-F-K007-D1-001",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-538a151c59e30990",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-42db33cf602ba3a4",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FM-465521853817e02b",
+      "question_type": "multiple_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-cf99b58e86b40653",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FC-796bab242d8e76ff",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FS-9a0953f912e79012",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FF-c0caf0e87728a874",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FC-08025b5b12538373",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FC-38806b67b3071e71",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-4141fdcda33601e9",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FC-664306d6909ade55",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FS-83b67d7e75f29757",
+      "question_type": "subjective",
+      "is_correct": null
+    }
+  ],
+  "adaptive": [
+    {
+      "question_id": "FC-1aadc879a4516adb",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FC-fd25b22d8ec65d5c",
+      "question_type": "single_choice",
+      "is_correct": 0
+    },
+    {
+      "question_id": "FF-8346100aac0767b3",
+      "question_type": "fill_blank",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FS-27270c2ac86626cc",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FS-d8d7d54caccd85a9",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FS-f33c947429f69f45",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FS-f95e0a7de582caeb",
+      "question_type": "subjective",
+      "is_correct": null
+    },
+    {
+      "question_id": "FC-345e2f7aadb1676d",
+      "question_type": "single_choice",
+      "is_correct": 0
+    },
+    {
+      "question_id": "Q004",
+      "question_type": "single_choice",
+      "is_correct": 1
+    },
+    {
+      "question_id": "FF-8346100aac0767b3",
+      "question_type": "fill_blank",
+      "is_correct": 0
+    }
+  ],
+  "first_8_multiple_types": true,
+  "uploaded_image_saved": true,
+  "immediate_repeats": [],
+  "production_snapshot_unchanged": true,
+  "production_snapshot": {
+    "questions_count": 133,
+    "attempts_count": 61,
+    "attempts_digest": "661a4d4d952cd9f059c4016bf592eadafd983dab7205a10d9857f4b8ad403115"
+  },
+  "screenshots_directory": "E:\\Projects\\math_ai\\tmp\\v1_0d_4_browser_20261006T180012",
+  "formula_dom_checked": true
+}

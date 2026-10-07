@@ -1,0 +1,22 @@
+{
+  "backup": "E:\\Projects\\math_ai\\backups\\math_ai_before_v1_0d_4_20261006T175948292013Z.sqlite3",
+  "production": true,
+  "snapshot_before": {
+    "questions_count": 133,
+    "attempts_count": 61,
+    "attempts_digest": "661a4d4d952cd9f059c4016bf592eadafd983dab7205a10d9857f4b8ad403115"
+  },
+  "snapshot_after": {
+    "questions_count": 133,
+    "attempts_count": 61,
+    "attempts_digest": "661a4d4d952cd9f059c4016bf592eadafd983dab7205a10d9857f4b8ad403115"
+  },
+  "attempts_unchanged": true,
+  "mastery_digest_before": "8b618c87c2097a3fd75336b2e478803fdc9bdefa9773e85a46bb6678303979ff",
+  "mastery_digest_after": "8b618c87c2097a3fd75336b2e478803fdc9bdefa9773e85a46bb6678303979ff",
+  "mastery_unchanged": true,
+  "status_counts": {
+    "valid": 128,
+    "formula_manual_review": 5
+  }
+}

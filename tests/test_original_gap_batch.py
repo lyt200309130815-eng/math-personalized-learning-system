@@ -8,6 +8,7 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from unittest.mock import patch
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -29,6 +30,7 @@ ORIGINAL=ROOT/'data/question_bank/candidates/function_batch_003_original.jsonl'
 
 class OriginalGapBatchTests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         self.originals=read_jsonl(ORIGINAL)
         self.gold=read_jsonl(GOLD)
         self.previous=read_jsonl(ROOT/'data/question_bank/approved/function_batch_001_approved.jsonl')

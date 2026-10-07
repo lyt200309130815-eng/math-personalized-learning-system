@@ -1,0 +1,36 @@
+{
+  "stage": "V1.0C",
+  "network_question_fetch": false,
+  "llm_learning_decisions": false,
+  "historical_rows_unchanged": true,
+  "templates": 5,
+  "migration_repeated_successfully": true,
+  "historical_digests": {
+    "questions": "6085ad9860e4be64792c626df5b0409f010d9ba01356b311d6005c2027f22e03",
+    "attempts": "92f962a325341c6904ee7041e9283c28d4f75a98581d0c0eeca42c759674b565",
+    "training_sessions": "fce88f1c1edc7c0998c67fa78ec9b0392582c8ef5b75d1cd198e221ff2dab0c7",
+    "question_sources": "1095ad819ad627fdb9937623c08c4868654daccedc9597a9ec2b9c722dca9504"
+  },
+  "web_validation": "Streamlit AppTest with temporary SQLite database: four hints, incorrect answer, student error choice, retry, summary",
+  "tests_passed": 294,
+  "new_tests": 8,
+  "test_command": "python -m unittest discover -s tests -q",
+  "diff_check": "passed",
+  "created_files": [
+    "database/variation.py",
+    "services/error_diagnosis.py",
+    "services/training_support.py",
+    "services/question_variation.py",
+    "scripts/migrate_variation.py",
+    "tests/test_variation_training.py",
+    "reports/v1_0c_validation.json"
+  ],
+  "modified_files": [
+    "database/database.py",
+    "database/training_sessions.py",
+    "services/adaptive_training.py",
+    "services/recommendation.py",
+    "pages/training.py",
+    "README.md"
+  ]
+}

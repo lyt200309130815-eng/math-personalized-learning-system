@@ -8,6 +8,7 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from unittest.mock import patch
 
 from streamlit.testing.v1 import AppTest
@@ -28,6 +29,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class FunctionV2Tests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.path=Path(self.temp.name)/'v2.db'
         initialize_database(self.path)
@@ -255,11 +257,12 @@ class FunctionV2Tests(unittest.TestCase):
                 app=AppTest.from_file(str(ROOT/f'pages/{page}.py')).run()
                 self.assertFalse(app.exception,page)
             app=AppTest.from_file(str(ROOT/'pages/training.py')).run()
-            q=get_training_questions()[0]
-            app.radio[0].set_value(q['answer']).run()
             app.button[0].click().run()
+            q=app.session_state['adaptive_training_state']['current_question']
+            app.radio[0].set_value(q['answer']).run()
+            next(b for b in app.button if b.label=='提交答案').click().run()
             self.assertFalse(app.exception)
-            self.assertTrue(app.session_state['submitted'])
-            self.assertIsNotNone(app.session_state['recorded_attempt_id'])
+            self.assertTrue(app.session_state['adaptive_training_state']['submitted'])
+            self.assertIsNotNone(app.session_state['adaptive_training_state']['answers'][0]['attempt_id'])
             with closing(get_connection(self.path)) as c:
                 self.assertEqual(c.execute('SELECT COUNT(*) FROM attempts').fetchone()[0],8)

@@ -1,0 +1,11 @@
+{
+  "approved_counts": {
+    "multiple_choice": 20,
+    "fill_blank": 25,
+    "subjective": 16
+  },
+  "blocked": [],
+  "candidate_files_unchanged": true,
+  "reviewed_by": "manual_user",
+  "runtime_packaging_only": true
+}

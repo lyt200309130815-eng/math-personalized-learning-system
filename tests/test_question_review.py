@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from unittest.mock import patch
 
 from question_bank_helpers import candidate
@@ -16,6 +17,7 @@ from services.question_review import ReviewSession, read_jsonl
 
 class ReviewWorkflowTests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)

@@ -76,7 +76,10 @@ def import_questions(candidates: list[dict], *, database_path: str | Path) -> di
 
 
 def get_approved_questions(knowledge_point_id: str, *, database_path: str | Path) -> list[dict]:
-    """Approved-only v2 bank read boundary for future training/recommendation adapters."""
+    """Read immutable approved source records, preserving their source fingerprints.
+
+    Student training reads canonical, formula-gated questions through database.py.
+    """
     with closing(get_connection(database_path, read_only=True)) as connection:
         if not connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
                                   ("approved_question_bank",)).fetchone():
@@ -84,4 +87,73 @@ def get_approved_questions(knowledge_point_id: str, *, database_path: str | Path
         rows = connection.execute("""SELECT payload FROM approved_question_bank
             WHERE taxonomy_version = ? AND primary_knowledge_point_id = ? AND quality_status = ?
             ORDER BY id""", ("function_v2", knowledge_point_id, "approved")).fetchall()
-    return [json.loads(row["payload"]) for row in rows]
+    from services.math_normalizer import audit_question
+    result = []
+    for row in rows:
+        item = json.loads(row['payload'])
+        if not audit_question(item)['issues']:
+            result.append(item)
+    return result
+
+
+def activate_training_questions(candidates: list[dict], *, database_path: str | Path,
+                                allow_production: bool = False, quarantine_formulas: bool = False) -> dict:
+    """Explicit approved-only adapter into the migrated training store.
+
+    Extracting/reviewing/importing candidates never calls this automatically.
+    A production activation needs a caller's explicit authorization flag.
+    """
+    path = Path(database_path).resolve()
+    is_production = path == DATABASE_PATH.resolve() or (path.exists() and DATABASE_PATH.exists() and os.path.samefile(path,DATABASE_PATH))
+    if is_production and not allow_production:
+        raise ValueError('真实数据库激活需要明确授权。')
+    for q in candidates:
+        validation = validate_candidate(q, check_formulas=not quarantine_formulas)
+        if q.get('quality_status')!='approved' or not validation['can_approve']:
+            raise ValueError('只有人工批准且通过分类校验的题才能进入训练。')
+    from database.multi_type import migrate_multi_type, insert_question_details
+    from database.taxonomy_migration import _insert_mapping
+    migrate_multi_type(path)
+    expanded = any(q.get('question_type') == 'multiple_choice' or q.get('answer_type') == 'set'
+                   or any(k in q for k in ('canonical_answer', 'sub_questions')) for q in candidates)
+    if expanded:
+        from database.four_type import migrate_four_type
+        migrate_four_type(path, allow_production=allow_production)
+    inserted,skipped = 0,0
+    with closing(get_connection(path)) as conn, conn:
+        conn.execute('BEGIN IMMEDIATE')
+        historical_attempts=[tuple(r) for r in conn.execute('SELECT * FROM attempts ORDER BY id')]
+        for q in candidates:
+            from services.math_normalizer import audit_question
+            from database.formula_status import store_status
+            formula=audit_question(q)
+            q=formula['normalized'] if not formula['issues'] else q
+            existing = conn.execute('SELECT fingerprint FROM question_sources WHERE question_id=?',(q['id'],)).fetchone()
+            if existing:
+                if existing[0]!=q['fingerprint']: raise ValueError('相同题号对应不同内容。')
+                skipped+=1
+                continue
+            if conn.execute("SELECT 1 FROM question_sources WHERE taxonomy_version='function_v2' AND fingerprint=?",(q['fingerprint'],)).fetchone():
+                skipped+=1
+                continue
+            kind = q.get('question_type','single_choice')
+            conn.execute('INSERT INTO questions VALUES (?,?,?,?,?,?,?,?,?,?)',
+                         (q['id'],q['stem'],json.dumps(q['options'],ensure_ascii=False) if kind in ('single_choice','multiple_choice') else None,
+                          q.get('answer') if kind=='single_choice' else None,q['explanation'],
+                          'function_v2:'+q['primary_knowledge_point_id'],q['difficulty'],q['ability_tags'][0],kind,q['estimated_time']))
+            insert_question_details(conn,q)
+            if expanded:
+                from database.four_type import insert_extensions
+                insert_extensions(conn, q)
+            _insert_mapping(conn,q['id'],q['primary_knowledge_point_id'],q['related_knowledge_point_ids'],
+                            q['question_prerequisite_ids'],q['ability_tags'],q['method_tags'])
+            conn.execute('INSERT INTO question_sources VALUES (?,?,?,?,?,?,?,?,?)',
+                         ('function_v2:'+q['id'],q['id'],'function_v2',q['source_type'],q['source_file'],q['source_locator'],
+                          str(q['version']),'approved',q['fingerprint']))
+            store_status(conn,q)
+            inserted+=1
+        if historical_attempts != [tuple(r) for r in conn.execute('SELECT * FROM attempts ORDER BY id')]:
+            raise ValueError('导入改变历史作答，整批回滚。')
+        if conn.execute('PRAGMA foreign_key_check').fetchall():
+            raise ValueError('导入外键校验失败，整批回滚。')
+    return {'inserted':inserted,'skipped':skipped}

@@ -1,0 +1,46 @@
+{
+  "stage": "V1.0D.2",
+  "browser": "Microsoft Edge headless via CDP",
+  "streamlit_real_http": true,
+  "database_isolated_copy": true,
+  "production_attempts_written": 0,
+  "ocr_called": false,
+  "cases": [
+    {
+      "question_type": "single_choice",
+      "question_id": "FC-02bf73b5a5054051",
+      "result": "passed",
+      "correctness": 1,
+      "screenshot": "E:\\Projects\\math_ai\\tmp\\v1_0d_2_browser_20261006T160227\\single_choice.png",
+      "image_upload_verified": false,
+      "pending_mastery_unchanged": null
+    },
+    {
+      "question_type": "multiple_choice",
+      "question_id": "FM-00e0f8049c41c3db",
+      "result": "passed",
+      "correctness": 1,
+      "screenshot": "E:\\Projects\\math_ai\\tmp\\v1_0d_2_browser_20261006T160227\\multiple_choice.png",
+      "image_upload_verified": false,
+      "pending_mastery_unchanged": null
+    },
+    {
+      "question_type": "fill_blank",
+      "question_id": "FF-48f7fc84a81cd43b",
+      "result": "passed",
+      "correctness": 1,
+      "screenshot": "E:\\Projects\\math_ai\\tmp\\v1_0d_2_browser_20261006T160227\\fill_blank.png",
+      "image_upload_verified": false,
+      "pending_mastery_unchanged": null
+    },
+    {
+      "question_type": "subjective",
+      "question_id": "FS-0e6179800b40a234",
+      "result": "passed",
+      "correctness": null,
+      "screenshot": "E:\\Projects\\math_ai\\tmp\\v1_0d_2_browser_20261006T160227\\subjective.png",
+      "image_upload_verified": true,
+      "pending_mastery_unchanged": true
+    }
+  ]
+}

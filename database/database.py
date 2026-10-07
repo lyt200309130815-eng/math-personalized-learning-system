@@ -3,7 +3,7 @@
 import sqlite3
 import json
 import math
-from contextlib import closing
+from contextlib import closing, nullcontext
 from pathlib import Path
 from settings import get_database_path, get_active_taxonomy_version
 
@@ -68,6 +68,10 @@ def record_attempt(
         raise ValueError("is_correct must be 0 or 1")
     if not math.isfinite(answer_time) or answer_time < 0:
         raise ValueError("answer_time must be finite and nonnegative")
+    if error_type is not None and error_type not in ('K','C','L','M','R','S'):
+        raise ValueError('Invalid error type')
+    if any(type(value) is not int or value < 0 for value in (hint_count,retry_count)):
+        raise ValueError('Hint and retry counts must be nonnegative integers')
     with closing(get_connection(database_path)) as connection:
         with connection:
             if _version(taxonomy_version)=='function_v2' and not connection.execute(
@@ -104,6 +108,16 @@ def get_recent_attempts(
         ).fetchall()
 
 
+def get_recent_question_ids(student_id: str, limit: int = 30, *, database_path=None):
+    """Recent distinct practiced questions; retries cannot shrink the window."""
+    if type(limit) is not int or limit < 0:
+        raise ValueError('limit must be nonnegative')
+    with closing(get_connection(database_path, read_only=True)) as conn:
+        return [r[0] for r in conn.execute('''SELECT question_id FROM attempts
+            WHERE student_id=? GROUP BY question_id ORDER BY MAX(id) DESC LIMIT ?''',
+            (student_id,limit))]
+
+
 def get_knowledge_point(
     knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> sqlite3.Row | None:
@@ -132,24 +146,33 @@ def get_function_knowledge_points(
 
 def get_knowledge_attempts(
     student_id: str, knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
+    connection: sqlite3.Connection | None = None,
 ) -> list[sqlite3.Row]:
     """Read all matching attempts with difficulty, newest first and deterministic ties."""
     if _version(taxonomy_version) == 'function_v2':
-        with closing(get_connection(database_path, read_only=True)) as connection:
-            return connection.execute('''SELECT a.id,a.is_correct,q.difficulty,a.created_at,a.question_id
+        with (closing(get_connection(database_path, read_only=True)) if connection is None else nullcontext(connection)) as connection:
+            gate = _scored_subjective_gate(connection)
+            return connection.execute(f'''SELECT a.id,a.is_correct,q.difficulty,a.created_at,a.question_id
                 FROM attempts a JOIN questions q ON q.id=a.question_id
                 JOIN question_knowledge_mappings m ON m.question_id=q.id
                 WHERE a.student_id=? AND m.taxonomy_version=? AND m.knowledge_point_id=?
-                AND m.role=? AND m.review_status=? ORDER BY a.created_at DESC,a.id DESC''',
+                AND m.role=? AND m.review_status=? AND a.is_correct IS NOT NULL {gate} ORDER BY a.created_at DESC,a.id DESC''',
                 (student_id,'function_v2',knowledge_point_id,'primary','approved')).fetchall()
-    with closing(get_connection(database_path, read_only=True)) as connection:
+    with (closing(get_connection(database_path, read_only=True)) if connection is None else nullcontext(connection)) as connection:
+        gate = _scored_subjective_gate(connection)
         return connection.execute(
-            """SELECT a.id, a.is_correct, q.difficulty, a.created_at, a.question_id
+            f"""SELECT a.id, a.is_correct, q.difficulty, a.created_at, a.question_id
                FROM attempts AS a JOIN questions AS q ON q.id = a.question_id
-               WHERE a.student_id = ? AND q.knowledge_point_id = ?
+               WHERE a.student_id = ? AND q.knowledge_point_id = ? AND a.is_correct IS NOT NULL {gate}
                ORDER BY a.created_at DESC, a.id DESC""",
             (student_id, knowledge_point_id),
         ).fetchall()
+
+
+def _scored_subjective_gate(connection):
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE name='attempt_details'").fetchone():
+        return "AND (q.question_type!='subjective' OR EXISTS (SELECT 1 FROM attempt_details d WHERE d.attempt_id=a.id AND d.scoring_status='scored')) AND NOT EXISTS (SELECT 1 FROM attempt_details d WHERE d.attempt_id=a.id AND d.scoring_status!='scored')"
+    return "AND q.question_type!='subjective'"
 
 
 def get_questions_for_knowledge(
@@ -157,7 +180,7 @@ def get_questions_for_knowledge(
 ) -> list[dict]:
     """Read practice previews without exposing correct answers or solutions."""
     if _version(taxonomy_version) == 'function_v2':
-        fields=('id','stem','difficulty','knowledge_point_id','knowledge_point_name')
+        fields=('id','stem','difficulty','knowledge_point_id','knowledge_point_name','question_type')
         return [{key:q[key] for key in fields} for q in get_approved_questions(knowledge_point_id, database_path=database_path,taxonomy_version='function_v2')]
     with closing(get_connection(database_path, read_only=True)) as connection:
         rows = connection.execute(
@@ -198,17 +221,55 @@ def get_question_prerequisites(question_id, taxonomy_version=None, *, database_p
         return [r[0] for r in c.execute('SELECT knowledge_point_id FROM question_prerequisites WHERE taxonomy_version=? AND question_id=? ORDER BY knowledge_point_id',(_version(taxonomy_version),question_id))]
 
 
-def get_approved_questions(knowledge_point_id=None, *, database_path=None, taxonomy_version=None):
+def get_approved_questions(knowledge_point_id=None, *, database_path=None, taxonomy_version=None, include_untrainable=False):
     version=_version(taxonomy_version)
     if version=='function_v1':
         rows=get_training_questions(database_path,taxonomy_version=version)
         return [q for q in rows if knowledge_point_id is None or q['knowledge_point_id']==knowledge_point_id]
     with closing(get_connection(database_path,read_only=True)) as c:
-        rows=c.execute('''SELECT q.id,q.stem,q.options,q.answer,q.explanation,q.difficulty,q.estimated_time,
+        rows=c.execute('''SELECT q.id,q.stem,q.options,q.answer,q.explanation,q.difficulty,q.estimated_time,q.question_type,
             m.knowledge_point_id,k.name AS knowledge_point_name FROM questions q
             JOIN question_knowledge_mappings m ON q.id=m.question_id
             JOIN knowledge_catalog k ON k.taxonomy_version=m.taxonomy_version AND k.id=m.knowledge_point_id
-            WHERE m.taxonomy_version=? AND m.role=? AND m.review_status=? AND q.question_type=?
+            WHERE m.taxonomy_version=? AND m.role=? AND m.review_status=?
             AND (? IS NULL OR m.knowledge_point_id=?) ORDER BY q.id''',
-            (version,'primary','approved','single_choice',knowledge_point_id,knowledge_point_id)).fetchall()
-    return [{**dict(r),'options':json.loads(r['options'])} for r in rows]
+            (version,'primary','approved',knowledge_point_id,knowledge_point_id)).fetchall()
+        metadata = {}
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='question_variants'").fetchone():
+            metadata = {r['question_id']:dict(r) for r in c.execute('SELECT * FROM question_variants')}
+        details = {}
+        formula_statuses = {}
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='question_formula_status'").fetchone():
+            formula_statuses = {r['question_id']:r['formula_status'] for r in c.execute('SELECT question_id,formula_status FROM question_formula_status')}
+        extensions = {}
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='question_type_extensions'").fetchone():
+            extensions = {r['question_id']:json.loads(r['payload']) for r in c.execute('SELECT * FROM question_type_extensions')}
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='question_details'").fetchone():
+            details = {r['question_id']:dict(r) for r in c.execute('SELECT * FROM question_details')}
+        sources = {r['question_id']:dict(r) for r in c.execute(
+            'SELECT question_id,source_type,source_file,locator,fingerprint FROM question_sources WHERE taxonomy_version=?',(version,))}
+    result = []
+    for row in rows:
+        q = {**dict(row),'options':json.loads(row['options']) if row['options'] else None,
+             'source_type':sources.get(row['id'],{}).get('source_type','original')}
+        source = sources.get(row['id'], {})
+        q.update(source_fingerprint=source.get('fingerprint'),source_file=source.get('source_file'),source_locator=source.get('locator'))
+        if row['id'] in details:
+            detail = details[row['id']]
+            q.update({k:(json.loads(v) if k in ('accepted_answers','solution_steps','rubric') and v is not None else v) for k,v in detail.items() if k!='question_id'})
+        if row['id'] in metadata:
+            extra = metadata[row['id']]
+            q.update({k:extra[k] for k in ('template_id','generator_version','variant_fingerprint','source_url','license','usage_note')})
+            q['parameter_set'] = json.loads(extra['parameter_set'])
+            q['hints'] = json.loads(extra['hints_json'])
+        q.update(extensions.get(row['id'], {}))
+        q['formula_status'] = formula_statuses.get(q['id'], 'unverified')
+        if not include_untrainable:
+            from services.math_normalizer import audit_question
+            audited = audit_question(q)
+            if audited['issues'] or q['formula_status'] in ('formula_warning','formula_manual_review','invalid'):
+                continue
+            q = audited['normalized']
+            q['formula_status'] = 'valid'
+        result.append(q)
+    return result

@@ -1,0 +1,765 @@
+{
+  "source_files_scanned": 15,
+  "source_sha256": {
+    "第二章　§2.10　函数的零点与方程的解.docx": "7da9bcec0a87e2c967224ca7ddab30c91eb45feb64b580942293fc9a92808b12",
+    "第二章　§2.11　函数与方程的综合应用.docx": "7b1851320c542276a55bb3d4b6ab48c9f5e4effdf12980cb5cb95b9ae125d796",
+    "第二章　§2.12　函数模型的应用.docx": "c0572c0a6b8e21e851bf0fa393f9e3792e048cf9774176514d12df2c03d555d7",
+    "第二章　§2.1　函数的概念及其表示.docx": "bfae8dfc6e13ba99cb9fbdb0e2a12574832dae6410fe637d5e24353e2a7730a1",
+    "第二章　§2.2　函数的单调性与最值.docx": "4a4da4a043a4a5f8afa3779129d634179d1dad121b475e710a0733c1cb0f34fb",
+    "第二章　§2.3　函数的奇偶性.docx": "2b98749942d46405dc0feb9ed1acfc75b54a012461b9fd5891e462e26657f25e",
+    "第二章　§2.4　函数的周期性和对称性.docx": "25d7a7bc92d4bc1b26b7b8da5051d6538bd27288a37b004ba4235b042f40b32f",
+    "第二章　§2.5　二次函数与幂函数.docx": "f3e07be2e9eb04b2560d04dfa55eae9b881bcf6b1a2087c16269f81e846ee462",
+    "第二章　§2.6　指数与指数函数.docx": "ec6f7661553cca7157518fc1cf4a9380542f8134559850d06c43bcbe2eb65b0e",
+    "第二章　§2.7　对数与对数函数.docx": "4e670ab7e922a6620ab14b5ad2aeb1b90cfc2e4a96ce6e02f27dd7d3508f9568",
+    "第二章　§2.8　指、对、幂的大小比较.docx": "ea22337bf55865e6c0c65c7f8fad4c96ccc2d3c0bd685c92184706145255a550",
+    "第二章　§2.9　函数的图象.docx": "6dcbe9321d132aa6947b40f4f1faf8fa5ae8555fb0608b50324cf7e0799557aa",
+    "第二章　必刷小题2　函数的概念与性质.docx": "8a3090a0ac7a0b0ea1eb450da245b9f84fa595720e72110c6519840779682806",
+    "第二章　必刷小题3　基本初等函数.docx": "e787e0fd585e547b1af86d7e786b3f1449f337a3875adc1e700bbca67406f78d",
+    "第二章　必刷小题4　函数与方程.docx": "99072ea99402992bc6be081a93f1d037d79b6498ee8133aa688339e08c43d4e5"
+  },
+  "recognized": {
+    "fill_blank": 74,
+    "subjective": 27
+  },
+  "selected": {
+    "fill_blank": 25,
+    "subjective": 16
+  },
+  "excluded": [
+    {
+      "id": "FF-bec33139f3252c9e",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 46–51",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-2769d7d327121261",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 78–82",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-2aceba17d3c66c0e",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 91–99",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "涉及未标注的三角函数基础，需人工确认可做性"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-18fae52a65ac8773",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 142–151",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-6b890dab7a3020d2",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 167–174",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-9174a455f6a13114",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 261–271",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-436a8b6f6a83eab5",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 288–305",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-b5ba1ba6eab9c023",
+      "source_file": "data/raw_sources/function/第二章　§2.10　函数的零点与方程的解.docx",
+      "source_locator": "word/document.xml paragraphs 316–324",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-20d62d42b411edf1",
+      "source_file": "data/raw_sources/function/第二章　§2.11　函数与方程的综合应用.docx",
+      "source_locator": "word/document.xml paragraphs 172–181",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-010e5cae48ab25c8",
+      "source_file": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "source_locator": "word/document.xml paragraphs 73–90",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "表格结构需人工核对"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-20fb255715bc32b1",
+      "source_file": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "source_locator": "word/document.xml paragraphs 160–189",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "表格结构需人工核对",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-da2e5a53350de554",
+      "source_file": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "source_locator": "word/document.xml paragraphs 194–224",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "提取状态非 complete",
+        "表格结构需人工核对"
+      ],
+      "extraction_status": "formula_warning"
+    },
+    {
+      "id": "FF-c88d022a2a2222ef",
+      "source_file": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "source_locator": "word/document.xml paragraphs 293–306",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "提取状态非 complete",
+        "表格结构需人工核对"
+      ],
+      "extraction_status": "formula_warning"
+    },
+    {
+      "id": "FS-6bca6da822f7f93f",
+      "source_file": "data/raw_sources/function/第二章　§2.12　函数模型的应用.docx",
+      "source_locator": "word/document.xml paragraphs 330–345",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-28b1e5752c1cf450",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 39–42",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-d19211e3caec290a",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 86–109",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "涉及未标注的三角函数基础，需人工确认可做性"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FS-da01971cd96a81fa",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 86–94",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "涉及未标注的三角函数基础，需人工确认可做性"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-a1eacb295612191f",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 144–150",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-c30ff6a7dccc0aad",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 297–301",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "提取状态非 complete",
+        "开放性填空答案不唯一，不适合首批确定性自动判分"
+      ],
+      "extraction_status": "manual_review"
+    },
+    {
+      "id": "FF-6024b966d573a978",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 306–316",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-42feceb7e5c46ead",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 318–333",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "提取状态非 complete",
+        "多空题尚未建立逐空答案映射，不进入首批"
+      ],
+      "extraction_status": "manual_review"
+    },
+    {
+      "id": "FF-2b20283c3251d6e8",
+      "source_file": "data/raw_sources/function/第二章　§2.1　函数的概念及其表示.docx",
+      "source_locator": "word/document.xml paragraphs 334–346",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "提取状态非 complete",
+        "多空题尚未建立逐空答案映射，不进入首批"
+      ],
+      "extraction_status": "manual_review"
+    },
+    {
+      "id": "FF-a5df54e151acc740",
+      "source_file": "data/raw_sources/function/第二章　§2.2　函数的单调性与最值.docx",
+      "source_locator": "word/document.xml paragraphs 55–62",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-4b180064ec643a7a",
+      "source_file": "data/raw_sources/function/第二章　§2.2　函数的单调性与最值.docx",
+      "source_locator": "word/document.xml paragraphs 145–153",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-f82570ca5a79caeb",
+      "source_file": "data/raw_sources/function/第二章　§2.2　函数的单调性与最值.docx",
+      "source_locator": "word/document.xml paragraphs 206–213",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-26b8189ad26f0c7b",
+      "source_file": "data/raw_sources/function/第二章　§2.2　函数的单调性与最值.docx",
+      "source_locator": "word/document.xml paragraphs 357–373",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "涉及未标注的三角函数基础，需人工确认可做性"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-83af3a12c3479f17",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 38–42",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-8a1cf71d39dfab1f",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 123–130",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-5b011ad14a0bcb49",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 296–303",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FS-d3a7eb39c31f19cf",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 305–317",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-30085acfd8451e0b",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 331–341",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-f91a3cd37e093ca6",
+      "source_file": "data/raw_sources/function/第二章　§2.3　函数的奇偶性.docx",
+      "source_locator": "word/document.xml paragraphs 342–356",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "提取状态非 complete",
+        "多空题尚未建立逐空答案映射，不进入首批"
+      ],
+      "extraction_status": "manual_review"
+    },
+    {
+      "id": "FF-11759129b80fcf57",
+      "source_file": "data/raw_sources/function/第二章　§2.4　函数的周期性和对称性.docx",
+      "source_locator": "word/document.xml paragraphs 31–35",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-a9cb9f4e4506cd68",
+      "source_file": "data/raw_sources/function/第二章　§2.5　二次函数与幂函数.docx",
+      "source_locator": "word/document.xml paragraphs 64–67",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-db93007174aee61a",
+      "source_file": "data/raw_sources/function/第二章　§2.5　二次函数与幂函数.docx",
+      "source_locator": "word/document.xml paragraphs 141–154",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-512762b74f9b78ef",
+      "source_file": "data/raw_sources/function/第二章　§2.5　二次函数与幂函数.docx",
+      "source_locator": "word/document.xml paragraphs 350–357",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-082cee7aae5aab8e",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 53–56",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "开放性填空答案不唯一，不适合首批确定性自动判分"
+      ],
+      "extraction_status": "manual_review"
+    },
+    {
+      "id": "FF-4865240264d9ee87",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 89–93",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-de00458664320bbd",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 129–134",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-ed139cb73fcf39c2",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 144–151",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-a15fb499186b7527",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 188–197",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-99208b3a6cdce05c",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 315–319",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-58472e421d43356d",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 320–326",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-daefc2d4a81a25ad",
+      "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+      "source_locator": "word/document.xml paragraphs 341–356",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-9096be92c4159bf3",
+      "source_file": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "source_locator": "word/document.xml paragraphs 59–62",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-57c4b44ce5724058",
+      "source_file": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "source_locator": "word/document.xml paragraphs 93–95",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-ec4e441e467220d6",
+      "source_file": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "source_locator": "word/document.xml paragraphs 143–150",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-e7ed2174c631702e",
+      "source_file": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "source_locator": "word/document.xml paragraphs 269–277",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FS-0a00b8688ceb544e",
+      "source_file": "data/raw_sources/function/第二章　§2.7　对数与对数函数.docx",
+      "source_locator": "word/document.xml paragraphs 296–311",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-d5a61aca7a4883de",
+      "source_file": "data/raw_sources/function/第二章　§2.8　指、对、幂的大小比较.docx",
+      "source_locator": "word/document.xml paragraphs 189–197",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "stem 对数与分式的作用范围不明确，需核对原公式",
+        "explanation 对数与分式的作用范围不明确，需核对原公式"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-a6ddaf1ed3966c06",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 37–41",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "explanation 上下标嵌套或主体缺失，需核对公式",
+        "包含未确认的图片资源",
+        "提取状态非 complete"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-50f1b745dcf598f6",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 164–171",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-eb557456e7ce8671",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 254–260",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-72fa232933847d78",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 261–270",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-88d01e34db956b74",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 272–286",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "stem 数学表达式可能残缺",
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FS-f8ef99288f1edbe7",
+      "source_file": "data/raw_sources/function/第二章　§2.9　函数的图象.docx",
+      "source_locator": "word/document.xml paragraphs 287–299",
+      "question_type": "subjective",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-9331bbab68c3bd16",
+      "source_file": "data/raw_sources/function/第二章　必刷小题2　函数的概念与性质.docx",
+      "source_locator": "word/document.xml paragraphs 138–142",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-43ba157da6af4cca",
+      "source_file": "data/raw_sources/function/第二章　必刷小题3　基本初等函数.docx",
+      "source_locator": "word/document.xml paragraphs 115–119",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 对数与分式的作用范围不明确，需核对原公式"
+      ],
+      "extraction_status": "complete"
+    },
+    {
+      "id": "FF-afd4eacfe671393a",
+      "source_file": "data/raw_sources/function/第二章　必刷小题4　函数与方程.docx",
+      "source_locator": "word/document.xml paragraphs 117–123",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [
+        "explanation 数学表达式可能残缺",
+        "图象依赖尚未人工确认，需图片审核",
+        "包含未确认的图片资源",
+        "提取状态非 complete",
+        "解答依赖图象，优先留待图片人工审核"
+      ],
+      "extraction_status": "image_required"
+    },
+    {
+      "id": "FF-3b64009c225c6c81",
+      "source_file": "data/raw_sources/function/第二章　必刷小题4　函数与方程.docx",
+      "source_locator": "word/document.xml paragraphs 124–138",
+      "question_type": "fill_blank",
+      "errors": [],
+      "warnings": [],
+      "extraction_status": "complete"
+    }
+  ],
+  "all_selected_reviewed": true,
+  "automatically_approved": 0,
+  "source_files_unchanged": true,
+  "boundary_validation": "Subitem markers recognized only at paragraph starts; independent subquestions store disjoint source_ranges."
+}

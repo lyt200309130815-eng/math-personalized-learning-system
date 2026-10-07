@@ -4,6 +4,7 @@ from contextlib import closing
 from pathlib import Path
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 
 from database.database import DATABASE_PATH, get_connection, record_attempt
 from init_db import initialize_database
@@ -18,6 +19,7 @@ from question_bank_helpers import candidate, approved
 
 class ImporterTests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "isolated.db"

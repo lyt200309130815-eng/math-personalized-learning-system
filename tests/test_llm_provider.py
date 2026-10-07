@@ -4,6 +4,7 @@ import copy
 import os
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -18,6 +19,7 @@ from services.llm_provider import (
 
 class ProviderTests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         environment = patch.dict(os.environ, {
             "LLM_PROVIDER": "", "GEMINI_API_KEY": "", "GEMINI_MODEL": "",
             "OPENAI_API_KEY": "", "OPENAI_MODEL": "", "DEEPSEEK_API_KEY": "", "DEEPSEEK_MODEL": "",

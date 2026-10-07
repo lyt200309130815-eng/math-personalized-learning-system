@@ -37,7 +37,7 @@ def submit_training_answer(
         state["answer_time"] = max(0.0, current_time - state["question_started_at"])
     is_correct = int(selected == correct_answer)
     attempt_id = (record_attempt if recorder is None else recorder)(
-        student_id=STUDENT_ID, question_id=question_id, user_answer=selected,
+        student_id=state.get('student_id', STUDENT_ID), question_id=question_id, user_answer=selected,
         is_correct=is_correct, answer_time=state["answer_time"],
         hint_count=0, retry_count=0, error_type=None,
     )

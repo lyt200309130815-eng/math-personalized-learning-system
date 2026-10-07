@@ -1,0 +1,42 @@
+{
+  "stage": "V1.0D.2",
+  "database": "E:\\Projects\\math_ai\\math_ai.db",
+  "backup": "E:\\Projects\\math_ai\\backups\\math_ai_before_v1_0d_2_20261006T152122466066Z.sqlite3",
+  "before": {
+    "questions_count": 72,
+    "attempts_count": 33,
+    "attempts_digest": "64ddc6ba497cc9fa490172c5abe6c74428128556ac366dce9947c6640554164f"
+  },
+  "after": {
+    "questions_count": 133,
+    "attempts_count": 33,
+    "attempts_digest": "64ddc6ba497cc9fa490172c5abe6c74428128556ac366dce9947c6640554164f"
+  },
+  "approved_counts": {
+    "multiple_choice": 20,
+    "fill_blank": 25,
+    "subjective": 16
+  },
+  "migration": {
+    "applied": true
+  },
+  "import": {
+    "inserted": 61,
+    "skipped": 0
+  },
+  "repeat_import": {
+    "inserted": 0,
+    "skipped": 61
+  },
+  "question_type_counts": {
+    "fill_blank": 25,
+    "multiple_choice": 20,
+    "single_choice": 72,
+    "subjective": 16
+  },
+  "historical_attempts_unchanged": true,
+  "all_original_questions_unchanged": true,
+  "function_v1_unchanged": true,
+  "foreign_keys": 1,
+  "foreign_key_check": "passed"
+}

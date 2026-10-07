@@ -8,7 +8,7 @@ def format_percentage(value: float | None) -> str:
     return "未评估" if value is None else f"{value:.0%}"
 
 
-def build_profile_data(mastery_results: Sequence[dict]) -> dict:
+def build_profile_data(mastery_results: Sequence[dict], *, pending_by_point=None) -> dict:
     """Format metrics, aggregate counts, and omit unevaluated points from charts."""
     points = []
     chart = []
@@ -17,6 +17,9 @@ def build_profile_data(mastery_results: Sequence[dict]) -> dict:
                      "difficulty_performance", "mastery_score")
     for result in mastery_results:
         point = dict(result)
+        pending = (pending_by_point or {}).get(result['knowledge_point_id'],{})
+        point['pending_subjective_count'] = pending.get('subjective',0)
+        point['pending_fill_blank_count'] = pending.get('fill_blank',0)
         point["mastery_display"] = format_percentage(result["mastery_score"])
         point["metric_displays"] = {field: format_percentage(result[field]) for field in metric_fields}
         point["evidence_note"] = (
@@ -52,5 +55,6 @@ def build_profile_data(mastery_results: Sequence[dict]) -> dict:
             "unevaluated_count": len(unevaluated), "total_attempts": total_attempts,
             "overall_accuracy_display": (
                 format_percentage(total_correct / total_attempts) if total_attempts else "暂无数据"),
+            "pending_total":sum(p['pending_subjective_count']+p['pending_fill_blank_count'] for p in points),
         },
     }

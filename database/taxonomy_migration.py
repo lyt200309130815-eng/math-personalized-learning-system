@@ -1,4 +1,4 @@
-"""Transactional additive taxonomy migration; V0.9A accepts isolated copies only."""
+"""Shared transactional V2 migration; production requires explicit authorization."""
 from contextlib import closing
 import hashlib
 import json
@@ -64,8 +64,51 @@ def require_isolated(path):
     return path
 
 
-def migrate_function_v2(path, approved):
-    path=require_isolated(path)
+def protected_snapshot(connection):
+    """Hash every field of historical rows in stable primary-key order."""
+    rows = {table: [list(row) for row in connection.execute(f'SELECT * FROM {table} ORDER BY id')]
+            for table in ('knowledge_points', 'questions', 'attempts')}
+    attempts = rows['attempts']
+    return dict(rows=rows, questions_count=len(rows['questions']), attempts_count=len(attempts),
+                attempts_digest=hashlib.sha256(json.dumps(attempts, ensure_ascii=False, sort_keys=True).encode()).hexdigest())
+
+
+def verify_migration(connection, before, approved):
+    """Fail inside the transaction so any data or schema damage rolls back."""
+    after = protected_snapshot(connection)
+    if before['rows']['attempts'] != after['rows']['attempts']:
+        raise ValueError('历史 attempts 改变，迁移回滚。')
+    for table in ('knowledge_points', 'questions'):
+        current = {row[0]: row for row in after['rows'][table]}
+        if any(current.get(row[0]) != row for row in before['rows'][table]):
+            raise ValueError(f'原有 {table} 行改变，迁移回滚。')
+    points = [dict(id=r[0], prerequisite_ids=[p[0] for p in connection.execute(
+        "SELECT prerequisite_id FROM knowledge_prerequisites WHERE taxonomy_version='function_v2' AND knowledge_point_id=?", (r[0],))])
+        for r in connection.execute("SELECT id FROM knowledge_catalog WHERE taxonomy_version='function_v2'")]
+    if {p['id'] for p in points} != {f'K{i:03d}' for i in range(1, 16)}:
+        raise ValueError('V2知识点不完整。')
+    validate_graph(points)
+    expected = {q['id'] for q in approved} | {f'Q00{i}' for i in range(1, 7)}
+    actual = connection.execute("SELECT question_id,COUNT(*) FROM question_knowledge_mappings WHERE taxonomy_version='function_v2' AND role='primary' AND review_status='approved' GROUP BY question_id").fetchall()
+    if {r[0] for r in actual} != expected or any(r[1] != 1 for r in actual):
+        raise ValueError('已批准主映射不完整或不唯一。')
+    for question, primary in (('Q005', 'K003'), ('Q006', 'K004')):
+        mapping = {(r[0], r[1]) for r in connection.execute("SELECT knowledge_point_id,role FROM question_knowledge_mappings WHERE taxonomy_version='function_v2' AND question_id=?", (question,))}
+        if mapping != {(primary, 'primary'), ('K007', 'related')}:
+            raise ValueError('旧参数题映射错误。')
+    if connection.execute('PRAGMA foreign_key_check').fetchall():
+        raise ValueError('外键检查失败。')
+
+
+def _activate(connection):
+    connection.execute("UPDATE taxonomy_versions SET status='retired' WHERE version='function_v1' AND status!='retired'")
+    connection.execute("UPDATE taxonomy_versions SET status='active' WHERE version='function_v2' AND status!='active'")
+
+
+def migrate_function_v2(path, approved, *, allow_production=False):
+    path=Path(path).resolve() if allow_production else require_isolated(path)
+    if not path.is_file():
+        raise FileNotFoundError('待迁移数据库不存在，拒绝创建空库。')
     taxonomy=load_taxonomy(); points=taxonomy['knowledge_points']; validate_graph(points)
     if len(points)!=15: raise ValueError('function_v2必须有15个节点。')
     if len({q['id'] for q in approved})!=len(approved) or len({q['fingerprint'] for q in approved})!=len(approved):
@@ -79,10 +122,14 @@ def migrate_function_v2(path, approved):
     with closing(get_connection(path)) as c:
         with c:
             c.execute('BEGIN IMMEDIATE')
+            before = protected_snapshot(c)
             for sql in SCHEMA: c.execute(sql)
             old=c.execute('SELECT mapping_digest FROM taxonomy_migrations WHERE migration_id=?',('function_v2_initial',)).fetchone()
             if old:
                 if old['mapping_digest']!=digest: raise ValueError('迁移清单摘要改变，拒绝覆盖。')
+                if allow_production:
+                    _activate(c)
+                verify_migration(c, before, approved)
                 return {'inserted':0,'skipped':len(approved)}
             c.executemany('INSERT INTO taxonomy_versions(version,status) VALUES (?,?)',[('function_v1','active'),('function_v2','draft')])
             legacy=c.execute("SELECT * FROM knowledge_points WHERE topic=? ORDER BY id",('函数',)).fetchall()
@@ -116,6 +163,9 @@ def migrate_function_v2(path, approved):
                            q.get('source_ref',str(q['version'])),'approved',q['fingerprint']))
             c.execute('INSERT INTO taxonomy_migrations(migration_id,source_version,target_version,mapping_digest,status) VALUES (?,?,?,?,?)',
                       ('function_v2_initial','function_v1','function_v2',digest,'applied'))
+            if allow_production:
+                _activate(c)
+            verify_migration(c, before, approved)
     return {'inserted':len(approved),'skipped':0}
 
 

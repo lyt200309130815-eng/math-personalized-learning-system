@@ -1,0 +1,42 @@
+{
+  "tests_passed": 286,
+  "approved_options_complete": 66,
+  "options_match_jsonl": 66,
+  "validation_database": "disposable production backup",
+  "real_api_called": false,
+  "recommended_target": "K001",
+  "training_target": "K001",
+  "completed_answers": 3,
+  "answer_trace": [
+    {
+      "index": 1,
+      "difficulty": 1,
+      "options_present": true,
+      "attempt_saved_once": true
+    },
+    {
+      "index": 2,
+      "difficulty": 1,
+      "options_present": true,
+      "attempt_saved_once": true
+    },
+    {
+      "index": 3,
+      "difficulty": 2,
+      "options_present": true,
+      "attempt_saved_once": true
+    }
+  ],
+  "target_stayed_consistent": true,
+  "exactly_three_new_attempts": true,
+  "http_status": {
+    "/": 200,
+    "/_stcore/health": 200,
+    "/recommendation": 200,
+    "/training": 200,
+    "/diagnostic": 200,
+    "/profile": 200,
+    "/feedback": 200
+  },
+  "production_records_unchanged": true
+}

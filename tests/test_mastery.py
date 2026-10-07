@@ -4,6 +4,7 @@ import math
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from contextlib import closing
 from itertools import product
 from pathlib import Path
@@ -17,6 +18,7 @@ from services.mastery import (
 
 class MasteryTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"

@@ -36,6 +36,7 @@ def get_evidence_level(attempt_count: int) -> str:
 
 def calculate_knowledge_mastery(
     student_id: str, knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
+    connection=None,
 ) -> dict:
     """Return all evidence and metrics for one point; never persist derived scores.
 
@@ -47,7 +48,8 @@ def calculate_knowledge_mastery(
     point = get_knowledge_point(knowledge_point_id, **kwargs)
     if point is None:
         raise ValueError(f"Unknown knowledge point: {knowledge_point_id}")
-    attempts = get_knowledge_attempts(student_id, knowledge_point_id, **kwargs)
+    attempt_kwargs = {**kwargs, 'connection': connection} if connection is not None else kwargs
+    attempts = get_knowledge_attempts(student_id, knowledge_point_id, **attempt_kwargs)
     count = len(attempts)
     correct_count = sum(row["is_correct"] for row in attempts)
     result = {

@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from unittest.mock import patch
 
 from streamlit.testing.v1 import AppTest
@@ -29,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BatchIntegrationTests(unittest.TestCase):
     def setUp(self):
+        use_v1_test_config(self)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)

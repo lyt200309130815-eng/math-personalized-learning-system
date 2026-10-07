@@ -4,6 +4,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from contextlib import closing
 from pathlib import Path
 from unittest.mock import patch
@@ -21,6 +22,7 @@ from services.recommendation import (
 
 class RecommendationTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"
@@ -354,6 +356,9 @@ def run_acceptance_scenarios(database_path: Path) -> list[dict]:
 
 
 class RecommendationAcceptanceTests(unittest.TestCase):
+    def setUp(self):
+        use_v1_test_config(self)
+
     def test_eight_real_history_acceptance_scenarios(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             reports = run_acceptance_scenarios(Path(directory) / "acceptance.db")

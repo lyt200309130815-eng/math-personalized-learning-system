@@ -5,6 +5,7 @@ import json
 import os
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -23,6 +24,7 @@ from services.feedback import (
 
 class FeedbackTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"

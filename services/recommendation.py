@@ -6,6 +6,7 @@ from pathlib import Path
 from database.database import (
     DATABASE_PATH, get_function_knowledge_points, get_questions_for_knowledge, get_recent_attempts,
     get_question_prerequisites,
+    get_recent_question_ids,
 )
 from settings import get_active_taxonomy_version
 from services.mastery import calculate_knowledge_mastery, calculate_student_mastery
@@ -50,6 +51,7 @@ def _priority(mastery: dict, depth: int = 0) -> tuple:
 
 def recommend_next_knowledge(
     student_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
+    knowledge_point_id: str | None = None,
 ) -> dict:
     """Choose a priority target, then recursively fall back to unmet prerequisites."""
     kwargs = {'database_path': database_path}
@@ -89,7 +91,10 @@ def recommend_next_knowledge(
             return key
         return min(candidates, key=lambda candidate: _priority(mastery_by_id[candidate]))
 
-    origin = min(results, key=lambda result: _priority(result, depths[result["knowledge_point_id"]]))
+    if knowledge_point_id is not None and knowledge_point_id not in mastery_by_id:
+        raise ValueError('未知知识点。')
+    origin = (mastery_by_id[knowledge_point_id] if knowledge_point_id is not None else
+              min(results, key=lambda result: _priority(result, depths[result["knowledge_point_id"]])))
     target = mastery_by_id[resolve(origin["knowledge_point_id"])]
     strategy = get_recommendation_type(target)
     score = target["mastery_score"]
@@ -129,7 +134,9 @@ def _select_questions(student_id: str, target: dict, limit: int, database_path, 
             return score is not None and score>=0.60 and all(ready(p,trail+(key,)) for p in graph[key])
         if any(not ready(p) for p in graph[target['knowledge_point_id']]): return []
         questions = [q for q in questions if all(ready(p) for p in get_question_prerequisites(q['id'], 'function_v2', database_path=database_path))]
-    recent_ids = {row["question_id"] for row in get_recent_attempts(student_id, 10, **kwargs)}
+    recent_ids = (set(get_recent_question_ids(student_id,database_path=database_path))
+                  if (taxonomy_version or get_active_taxonomy_version()) == 'function_v2'
+                  else {row['question_id'] for row in get_recent_attempts(student_id,10,**kwargs)})
     low, high = get_difficulty_range(target)
 
     def sort_key(question: dict) -> tuple:

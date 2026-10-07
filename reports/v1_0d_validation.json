@@ -1,0 +1,105 @@
+{
+  "stage": "V1.0D",
+  "migration": {
+    "first": {
+      "applied": true,
+      "migration_id": "v1_0d_multi_type"
+    },
+    "repeat": {
+      "applied": false,
+      "migration_id": "v1_0d_multi_type"
+    },
+    "historical_rows_unchanged": true,
+    "historical_snapshots": {
+      "questions": {
+        "count": 72,
+        "sha256": "6085ad9860e4be64792c626df5b0409f010d9ba01356b311d6005c2027f22e03"
+      },
+      "attempts": {
+        "count": 33,
+        "sha256": "92f962a325341c6904ee7041e9283c28d4f75a98581d0c0eeca42c759674b565"
+      },
+      "training_sessions": {
+        "count": 3,
+        "sha256": "fce88f1c1edc7c0998c67fa78ec9b0392582c8ef5b75d1cd198e221ff2dab0c7"
+      },
+      "training_session_questions": {
+        "count": 7,
+        "sha256": "d55ae7701c2dd2369ec930b73c95846f18a070e22aba1f595a8cf30a3cf8f2b6"
+      },
+      "question_sources": {
+        "count": 66,
+        "sha256": "1095ad819ad627fdb9937623c08c4868654daccedc9597a9ec2b9c722dca9504"
+      },
+      "question_variants": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backup": "tmp\\v1_0d_before_migration.sqlite3"
+  },
+  "production_question_counts": {
+    "single_choice": 72
+  },
+  "candidate_counts": {
+    "fill_blank": 25,
+    "subjective": 16
+  },
+  "candidate_status": "reviewed",
+  "automatically_approved": 0,
+  "real_candidate_training_imports": 0,
+  "network_used": false,
+  "ocr_called": false,
+  "llm_correctness_decisions": false,
+  "ui_validation": "Streamlit AppTest with temporary SQLite: single-choice regression, fill input + scoring, subjective text + pending status; image upload abstraction and file persistence separately tested",
+  "limitations": [
+    "Expression evaluation uses restricted elementary algebra; no automatic domain inference.",
+    "Subjective rubric scores are review drafts; no final automatic grading.",
+    "Reviewed local DOCX batches cannot participate in production training before human approval."
+  ],
+  "tests_passed": 314,
+  "new_tests": 20,
+  "test_command": "python -m unittest discover -s tests -q",
+  "diff_check": "passed",
+  "created_files": [
+    "database/multi_type.py",
+    "services/answer_evaluator.py",
+    "services/answer_attachments.py",
+    "services/question_renderer.py",
+    "services/question_type_policy.py",
+    "services/handwriting_recognition.py",
+    "services/source_extractors/docx_multi_type_extractor.py",
+    "scripts/extract_multi_type_batch.py",
+    "scripts/migrate_multi_type.py",
+    "tests/test_multi_type.py",
+    "docs/multi_type_engine.md",
+    "data/question_bank/candidates/function_fill_blank_batch_001.jsonl",
+    "data/question_bank/candidates/function_subjective_batch_001.jsonl",
+    "reports/function_fill_blank_batch_001_可读版.docx",
+    "reports/function_subjective_batch_001_可读版.docx",
+    "reports/multi_type_extraction_audit.json",
+    "reports/v1_0d_validation.json"
+  ],
+  "modified_files": [
+    ".gitignore",
+    "README.md",
+    "requirements.txt",
+    "database/database.py",
+    "services/adaptive_training.py",
+    "services/diagnostic.py",
+    "services/training_support.py",
+    "services/question_importer.py",
+    "services/question_validator.py",
+    "pages/training.py"
+  ],
+  "commands_executed": [
+    "Get-Content AGENTS.md and project modules",
+    "rg --files and rg searches",
+    "python scripts/extract_multi_type_batch.py",
+    "python -m unittest discover -s tests -p test_multi_type.py -q",
+    "python -m unittest discover -s tests -q",
+    "Local Python migration with SQLite backup, historical digest checks and PRAGMA foreign_key_check",
+    "git -c safe.directory=E:/Projects/math_ai diff --check",
+    "git -c safe.directory=E:/Projects/math_ai status --short"
+  ]
+}

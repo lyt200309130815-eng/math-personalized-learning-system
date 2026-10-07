@@ -1,0 +1,96 @@
+{
+  "question_id": "FM-0c83b8f5a4b3f4cc",
+  "source_file": "data/raw_sources/function/第二章　§2.6　指数与指数函数.docx",
+  "source_locator": "word/document.xml paragraphs 293–302",
+  "docx_extracted_paragraphs": [
+    {
+      "index": 293,
+      "text": "7.下列各式正确的是(　　)",
+      "warnings": []
+    },
+    {
+      "index": 294,
+      "text": "A.若2^(a)=(2)/(3)，则8^(a)=(8)/(27)",
+      "warnings": []
+    },
+    {
+      "index": 295,
+      "text": "B.若a^(m)=3，a^(n)=4，则a^((2m+3n)/(2))=24",
+      "warnings": []
+    },
+    {
+      "index": 296,
+      "text": "C.若a>0，则root(4,aroot(3,a))=a^((7)/(12))",
+      "warnings": []
+    },
+    {
+      "index": 297,
+      "text": "D.若a>0，b>0，则4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=-6ab^(-1)",
+      "warnings": []
+    },
+    {
+      "index": 298,
+      "text": "答案　ABD",
+      "warnings": []
+    },
+    {
+      "index": 299,
+      "text": "解析　对于A，因为2^(a)=(2)/(3)，所以8^(a)=2^(3a)=(2^(a))^(3)=(8)/(27)，A正确；",
+      "warnings": []
+    },
+    {
+      "index": 300,
+      "text": "对于B，a^((2m+3n)/(2))=a^(m)·a^((3n)/(2))=3·(a^(n))^((3)/(2))=3×4^((3)/(2))=3×(2^(2))^((3)/(2))=3×2^(3)=3×8=24，B正确；",
+      "warnings": []
+    },
+    {
+      "index": 301,
+      "text": "对于C，root(4,aroot(3,a))=root(4,a·a^((1)/(3)))=(a^((4)/(3)))^((1)/(4))=a^((1)/(3))，C错误；",
+      "warnings": []
+    },
+    {
+      "index": 302,
+      "text": "对于D，4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=4×(−(3)/(2))×a^((2)/(3)−(−(1)/(3)))b^(−(1)/(3)−(2)/(3))=-6ab^(-1)，D正确.",
+      "warnings": []
+    }
+  ],
+  "candidate_options": {
+    "A": "若2^(a)=(2)/(3)，则8^(a)=(8)/(27)",
+    "B": "若a^(m)=3，a^(n)=4，则a^((2m+3n)/(2))=24",
+    "C": "若a>0，则root(4,aroot(3,a))=a^((7)/(12))",
+    "D": "若a>0，b>0，则4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=-6ab^(-1)"
+  },
+  "database_before_options": {
+    "A": "若2^(a)=(2)/(3)，则8^(a)=(8)/(27)",
+    "B": "若a^(m)=3，a^(n)=4，则a^((2m+3n)/(2))=24",
+    "C": "若a>0，则root(4,aroot(3,a))=a^((7)/(12))",
+    "D": "若a>0，b>0，则4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=-6ab^(-1)"
+  },
+  "legacy_renderer_received": {
+    "A": "若2^(a)=(2)/(3)，则8^(a)=(8)/(27)",
+    "B": "若a^(m)=3，a^(n)=4，则a^((2m+3n)/(2))=24",
+    "C": "若a>0，则root(4,aroot(3,a))=a^((7)/(12))",
+    "D": "若a>0，b>0，则4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=-6ab^(-1)"
+  },
+  "legacy_renderer_produced": {
+    "A": "若$2^{a}$=(2)/(3)，则$8^{a}$=(8)/(27)",
+    "B": "若$a^{m}$=3，$a^{n}$=4，则$a^{(2m+3n)/(2)}$=24",
+    "C": "若a\\>0，则$\\sqrt[4]{aroot(3,a)}$=$a^{(7)/(12)}$",
+    "D": "若a\\>0，b\\>0，则4$a^{(2)/(3)}$$b^{−(1)/(3)}$÷(−(2)/(3)$a^{−(1)/(3)}$$b^{(2)/(3)}$)=-6$ab^{-1}$"
+  },
+  "database_after_options_preserved_for_review": {
+    "A": "若2^(a)=(2)/(3)，则8^(a)=(8)/(27)",
+    "B": "若a^(m)=3，a^(n)=4，则a^((2m+3n)/(2))=24",
+    "C": "若a>0，则root(4,aroot(3,a))=a^((7)/(12))",
+    "D": "若a>0，b>0，则4a^((2)/(3))b^(−(1)/(3))÷(−(2)/(3)a^(−(1)/(3))b^((2)/(3)))=-6ab^(-1)"
+  },
+  "formula_status": "formula_manual_review",
+  "trainable": false,
+  "safe_A_B_D_review_proposals": {
+    "A": "若$2^{a}=\\frac{2}{3},$则$8^{a}=\\frac{8}{27}$",
+    "B": "若$a^{m}=3,a^{n}=4,$则$a^{\\frac{2m+3n}{2}}=24$",
+    "D": "若$a>0,b>0,$则$4a^{\\frac{2}{3}}b^{-\\frac{1}{3}}\\div (-\\frac{2}{3}a^{-\\frac{1}{3}}b^{\\frac{2}{3}})=-6ab^{-1}$"
+  },
+  "C_docx_structure": "OMML rad(degree=4, expression=[run(a), rad(degree=3, expression=run(a))]); serialization lost the juxtaposition boundary",
+  "C_automatically_fixed": false
+}

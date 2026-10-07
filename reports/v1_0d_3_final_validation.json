@@ -1,0 +1,39 @@
+{
+  "stage": "V1.0D.3",
+  "tests_total": 396,
+  "tests_passed": 396,
+  "new_tests": 25,
+  "test_result": "OK",
+  "production_snapshot_unchanged": true,
+  "production_snapshot": {
+    "questions_count": 133,
+    "attempts_count": 47,
+    "attempts_digest": "9549ab292729cb896b2b869bbfe399420ed8f37e44f2ab9b4fccd5917341aa3a"
+  },
+  "approved_question_types": {
+    "single_choice": 72,
+    "fill_blank": 25,
+    "multiple_choice": 20,
+    "subjective": 16
+  },
+  "function_v1_question_count": 6,
+  "diagnostic_mix": {
+    "single_choice": 6,
+    "fill_blank": 7,
+    "multiple_choice": 2,
+    "subjective": 3
+  },
+  "adaptive_mix": {
+    "single_choice": 3,
+    "fill_blank": 1,
+    "subjective": 4
+  },
+  "knowledge_points_covered": 15,
+  "recent_source_and_variant_exposure_verified": true,
+  "real_browser_result": "passed",
+  "question_bank_expanded": false,
+  "production_attempts_modified": false,
+  "ocr_called": false,
+  "llm_objective_grading_called": false,
+  "committed": false
+}

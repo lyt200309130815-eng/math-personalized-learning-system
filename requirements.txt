@@ -1,3 +1,5 @@
 streamlit>=1.36,<2
 openai>=1.66,<3
 google-genai
+sympy>=1.12,<2
+pillow>=9,<13

@@ -3,6 +3,7 @@
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import Mock
@@ -14,6 +15,7 @@ from services.training import advance_question, initialize_training_state, submi
 
 class AttemptTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"

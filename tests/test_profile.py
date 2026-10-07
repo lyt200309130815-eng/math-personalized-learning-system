@@ -3,6 +3,7 @@
 import sqlite3
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from pathlib import Path
 from unittest.mock import patch
 
@@ -16,6 +17,7 @@ from services.profile import build_profile_data, format_percentage
 
 class ProfileTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"
@@ -135,7 +137,7 @@ class ProfileTests(unittest.TestCase):
         original_mastery = calculate_student_mastery
         with patch("database.database.get_training_questions", side_effect=lambda: original_questions(self.path)), \
                 patch("services.mastery.calculate_student_mastery", side_effect=lambda student: original_mastery(student, database_path=self.path)):
-            app = AppTest.from_file(str(self.root / "app.py")).run()
+            app = AppTest.from_file(str(self.root / "app.py")).run().switch_page("pages/training.py").run()
             app.radio[0].set_value("D").run()
             started_at = app.session_state["question_started_at"]
             app.switch_page("pages/profile.py").run()

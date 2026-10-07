@@ -3,6 +3,7 @@
 import json
 import tempfile
 import unittest
+from runtime_helpers import use_v1_test_config
 from pathlib import Path
 from unittest.mock import patch
 
@@ -15,6 +16,7 @@ from database.database import record_attempt
 
 class TrainingTests(unittest.TestCase):
     def setUp(self) -> None:
+        use_v1_test_config(self)
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.path = Path(directory.name) / "test.db"
@@ -58,7 +60,7 @@ class TrainingTests(unittest.TestCase):
         with patch("database.database.get_training_questions", side_effect=lambda: original(self.path)), \
                 patch("services.training.record_attempt", side_effect=lambda **kwargs: record_attempt(
                     **kwargs, database_path=self.path)):
-            app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run()
+            app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run().switch_page("pages/training.py").run()
             self.assertEqual(len(app.exception), 0)
             self.assertIsNone(app.radio[0].value)
             app.button[0].click().run()
@@ -92,7 +94,7 @@ class TrainingTests(unittest.TestCase):
 
     def test_empty_database_shows_chinese_message(self) -> None:
         with patch("database.database.get_training_questions", return_value=[]):
-            app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run()
+            app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run().switch_page("pages/training.py").run()
         self.assertEqual(len(app.exception), 0)
         self.assertIn("暂无函数专题选择题", app.info[0].value)
 

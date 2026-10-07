@@ -6,7 +6,7 @@ PRODUCTION_DATABASE_PATH = Path(__file__).resolve().parent / 'math_ai.db'
 
 
 def get_active_taxonomy_version() -> str:
-    version = os.environ.get('ACTIVE_TAXONOMY_VERSION', 'function_v1').strip() or 'function_v1'
+    version = os.environ.get('ACTIVE_TAXONOMY_VERSION', 'function_v2').strip() or 'function_v2'
     if version not in ('function_v1', 'function_v2'):
         raise ValueError('不支持的知识体系版本。')
     return version

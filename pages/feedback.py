@@ -5,6 +5,7 @@ import json
 import sqlite3
 
 import streamlit as st
+from services.math_text import render_math_text
 
 from services.feedback import (
     AIFeedbackUnavailable, build_feedback_context, build_rule_based_feedback, generate_learning_feedback,
@@ -14,11 +15,12 @@ from services.llm_provider import get_provider_config
 
 
 st.title("AI 学习反馈")
-st.write("当前学生：S001")
+student_id = st.session_state.get("student_id", "S001")
+st.write(f"当前学生：{student_id}")
 st.write("专题：函数")
 st.caption("反馈仅解释已有结果，不参与掌握度计算或推荐决策。")
 try:
-    context = build_feedback_context("S001")
+    context = build_feedback_context(student_id)
 except (sqlite3.Error, ValueError, FileNotFoundError):
     st.error("学情数据读取失败，请稍后重试；首次使用请先初始化数据库。")
     st.stop()
@@ -52,7 +54,7 @@ if st.button(label, disabled=not has_key):
     st.session_state.learning_feedback_error = None
     with st.spinner("正在生成学习反馈…"):
         try:
-            st.session_state.learning_feedback = generate_learning_feedback("S001", context=context)
+            st.session_state.learning_feedback = generate_learning_feedback(student_id, context=context)
             st.session_state.learning_feedback_source = "AI 辅助反馈"
         except AIFeedbackUnavailable as error:
             st.session_state.learning_feedback_error = str(error)
@@ -67,4 +69,4 @@ if st.session_state.learning_feedback_error:
     st.warning(st.session_state.learning_feedback_error)
 if st.session_state.learning_feedback:
     st.caption(st.session_state.learning_feedback_source)
-    st.markdown(st.session_state.learning_feedback)
+    render_math_text(st.session_state.learning_feedback)

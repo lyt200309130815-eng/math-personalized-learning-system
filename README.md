@@ -194,3 +194,126 @@ python -m streamlit run app.py
 版本化映射以关系表为事实来源。新增题在旧 questions 外键上使用 `function_v2:Kxxx` 兼容节点，其 topic 为 function_v2，不进入旧版本题池；不修改旧题正文、答案、旧外键及任何历史 attempts。新表提供15节点图、primary/related映射、题级前置、标签、来源和迁移审计。related 不计直接证据，新 K005 奇偶性不继承旧参数题分数。
 
 本阶段迁移函数明确禁止真实库路径。正式启用仍需用户另行授权对真实库进行受控迁移、复核原记录及备份，再设置 `ACTIVE_TAXONOMY_VERSION=function_v2`；不能仅设置版本变量而跳过数据库迁移。回退只需切回 function_v1，不删除新作答。
+
+## V1.0A 首次函数诊断测评
+
+入口仍为 `app.py`。首页和导航新增首次诊断；侧栏可输入本地学生编号（默认 S001），各页面共用该编号，不涉及账号注册。建议新学生用一个未使用过的编号，例如 S_NEW_001。
+
+诊断默认18题，每题提交后仅提示“回答已记录”，自动进入下一题，不显示答案或解析。选题来自 function_v2 的 approved primary 题池，难度优先1–2、必要时3；先对 K001/K002 各作两次基础探测，再按未测节点、前置图深度及难度进行确定性选择。前置至少两次作答且正确率低于50%时降低其后继优先级，保留广度探测；诊断探测不等同于允许进入高级训练，后续 recommendation 仍执行严格前置检查。无合适题目记录覆盖限制，题量不足时提前结束。
+
+`services/diagnostic.py` 负责选题、评分、测评生命周期和结果解释；`database/diagnostic.py` 负责向后兼容的旁路表。首次点击开始才创建 diagnostic_sessions 和 diagnostic_answers，不修改原 attempts schema 或旧记录，也不重跑 V0.9 迁移。诊断答案仍写入原 attempts；关联表标记 attempt_mode=diagnostic。写入作答、唯一关联和下一题状态使用同一事务，重复请求不会新增作答。数据库恢复当前题和计时，浏览器刷新、普通 rerun 或重新打开页面可续答；完成结果保存快照，仅明确点击“重新诊断”开始新测评，保留此前真实作答证据。
+
+结束展示正确率、15节点画像、四类确定性解释、覆盖限制及已有 recommendation 服务生成的学习目标和练习。“开始针对性训练”进入训练页面并限定推荐题池。分组沿用已有 taxonomy：K001–K002 基础概念、K003–K006 函数性质、K007–K011 基本初等函数、K012–K015 函数综合应用。无证据显示未评估，少量证据显式提示不确定性；重复诊断不删除历史证据，结果画像包含完成时的历史与本轮作答。
+
+V1.0A 最初使用专用试用库 tmp/function_v1_0a_local.db。V0.9B 正式迁移后，本地默认直接读取真实 math_ai.db 和 function_v2。若要继续使用隔离试用库，可运行：
+
+```powershell
+$env:MATH_AI_DATABASE_PATH = (Resolve-Path tmp/function_v1_0a_local.db).Path
+$env:ACTIVE_TAXONOMY_VERSION = "function_v2"
+python -m streamlit run app.py
+```
+
+访问 http://localhost:8501。保持两个配置用于本地试用；切换 function_v1 仍可回退使用原训练、画像和推荐。
+
+离线验证：`python -m unittest discover -s tests -p "test_*.py"`。新增测试验证选题、无证据、事务幂等、刷新恢复、完整画像、前置降权、缺题、重测、旧版回退及真实页面导航，不调用 LLM。
+
+## V0.9B 真实数据库正式迁移
+
+真实 `math_ai.db` 已经通过用户明确授权的正式迁移，function_v2 注册为 active；function_v1 保留为可回退视图。复用 V0.9A 的同一 schema、图、66道人工批准题和旧题映射，未删除旧表或旧行，未改动或重新评分历史 attempts。Q005 主映射 K003、Q006 主映射 K004，两题 related 均为 K007，新 K005 奇偶性不继承旧参数题。
+
+唯一生产 CLI：`python scripts/migrate_function_v2.py --production`。生产 opt-in 才允许真实路径，默认演练入口继续拒绝真实库。CLI 在写入前记录绝对路径、PRAGMA table_list、题数和 attempts 数量及全字段摘要。迁移使用 BEGIN IMMEDIATE，在提交前验证旧知识点/题目原行和全部 attempts 完全保持、15节点及无环图、approved primary 唯一、旧映射和外键；任何检查失败整笔回滚。重复相同清单 inserted=0/skipped=66，清单摘要改变时拒绝覆盖。
+
+已完成迁移，不需再次运行迁移或初始化。现在启动正式网页：
+
+```powershell
+# 若当前终端曾使用隔离库或旧版本配置，先清理覆盖配置
+Remove-Item Env:MATH_AI_DATABASE_PATH -ErrorAction SilentlyContinue
+Remove-Item Env:ACTIVE_TAXONOMY_VERSION -ErrorAction SilentlyContinue
+python -m streamlit run app.py
+```
+
+默认版本只由 settings.py 统一定义为 function_v2，所有查询和页面读取同一配置；环境变量仍可显式覆盖用于隔离测试或 function_v1 回退。诊断可在正式 V2 库使用；点击开始及提交才保存测评，迁移和页面验收不会模拟写入真实 attempts。训练和推荐页面隐藏题目内部 ID。
+
+完整自动测试仍运行 `python -m unittest discover -s tests -p "test_*.py" -v`。旧版测试显式选择 function_v1，V2 测试显式选择 function_v2，所有写入测试使用临时数据库。生产验收报告为 reports/function_v2_production_validation.json（已忽略），测试日志为 tmp/v0_9b_tests.log。
+
+## V1.0B 自适应训练系统
+
+入口和导航继续使用 app.py。V2 的“开始训练”页面现在提供“开始个性化训练”和“选择知识点训练”。首次诊断结束的“开始针对性训练”创建真实 adaptive session，不再固定传递一套推荐题。当前活动 session 可跨刷新和页面切换恢复；普通 rerun 不新建 session、不提交答案、不跳题。只有明确点击“下一题”重新选择下一道题；已提交题先显示正确/错误和解析。
+
+services/recommendation.py 决定学什么，并为手动选择和活动目标复用同一递归前置回退。services/adaptive_training.py 决定该目标下下一题及训练状态；始终只读 approved V2 主映射题，必要核心前置及题级前置必须满足，related 不作为门槛。一个 session 不自动跳到其他目标：目标完成、必要前置不足、题库不足或主动结束时先结束本轮，显示下一步建议，再由学生开始新一轮。
+
+初始建议难度：未评估或掌握度低于40%为1（优先1–2），40%–80%为2（允许相邻题），80%–90%为3，至少90%为4。少量证据会限制起始难度；两题以内最高建议2。连续两题正确且最近准确率至少60%时，结合最新掌握度、证据量和实际题目难度最多提高一档；连续至少两题错误逐步降低一档。建议难度限1–5，低掌握度最高2，不因偶然两题正确跳到5。实际选题仅在建议难度及相邻档位内寻找，安全上限还受证据量限制。
+
+每题 attempt 保存后，在同一事务内调用原 A/R/S/D mastery 服务，读取包含本次未提交事务内作答的掌握度，再更新 session 状态。mastery 公式没有改变。下一题优先当前难度的新题，再相邻难度的新题；默认避开最近10次 attempts，必要时使用此前做过但本轮未做过的相邻题。每个 session 内题目唯一；无安全、满足前置的题时显示覆盖不足，不复用本轮题目或生成新题。
+
+停止条件：至少5题且最近3题至少2题正确、掌握度达到80%；或者8题；或者必要前置不足、连续3题失败且掌握度低于40%、题库不足、主动结束。根节点失败时建议巩固当前基础，不凭 related 标签伪造前置回退。结束显示知识点、正确率、训练前后掌握度、实际题目难度轨迹、建议难度变化、停止原因和现有 recommendation 服务生成的下一步建议。部分节点题量少，可能不足5题就因覆盖限制结束；没有扩充题库。
+
+database/training_sessions.py 提供向后兼容 migration：training_sessions 保存身份、体系、目标、起止时间、状态、初始/最终掌握度及轻量 state_json；training_session_questions 保存题目顺序、实际难度、唯一 attempt_id 和 attempt_mode=training。schema_migrations 登记 v1_0b_training_sessions。原 attempts schema 和历史行不变：诊断通过原 diagnostic_answers 标识 diagnostic，新训练通过关联表标识 training，无关联的历史记录标识 legacy。选题、作答、关联记录和状态保存均使用事务；重复提交（含并发）只写一次，失败回滚。V1 页面由 pages/_training_v1.py 保留原训练行为，不另建入口。
+
+运行库已完成本阶段 session schema migration，无需重跑。新环境可运行 `python scripts/migrate_adaptive_training.py`，或首次开始训练时自动执行同一个幂等 migration。迁移前后校验全部旧知识点、题目和 attempts 原行保持一致，不重跑 taxonomy migration。
+
+DeepSeek 不参与选题、评分、掌握度、升降难度、前置及停止判断。本阶段使用规则训练总结；结束后可进入已有 AI 学习反馈页解释已有结果，无 Key 可查看规则反馈。
+
+运行仍为 `python -m streamlit run app.py`，默认真实数据库和 function_v2。完整离线测试273项通过，包含28项新增 adaptive 测试；日志 tmp/v1_0b_tests.log。网页验收使用迁移后真实库的一次性副本，经 Streamlit AppTest 完成18题诊断、查看画像、5题自适应训练、更新推荐和规则反馈；真实服务各路径 HTTP 200。验收报告 reports/v1_0b_validation.json：示例实际难度2→2→2→3→4、函数单调性掌握度0%→88.9%、推荐K003→K004，真实库未新增测试作答。
+
+## 推荐页与自适应训练衔接修复
+
+个性化推荐页面负责“学什么”，不负责答题。推荐数据是有意省略选项和答案的预览；真实训练查询在数据库层将 questions.options JSON 反序列化为 A/B/C/D 字典。已核对66道新增 approved 题的选项全部完整且与原 JSONL 一致，未重导题库或修改题目。
+
+推荐页显示目标名称（默认隐藏内部知识点编号）、推荐类型、掌握度、证据量、建议难度、推荐原因和预计5题/最多8题。主要按钮“开始推荐训练”调用 start_training_session，明确传入当前推荐知识点及 lock_target=True，然后进入训练页面。相同目标的活动 session 续答；不同目标的旧 session 先按主动切换结束并保留全部记录，再在同一事务内创建指定目标的 session。必要前置已变化时提示刷新推荐，不静默改换知识点。诊断入口复用同一目标锁定规则；自由进入训练页面仍允许 recommendation 自动选目标。
+
+推荐预览最多显示4条难度信息，并最多提供一道折叠题干预览，明确标注“进入训练后可正式作答”。题干、A/B/C/D、提交、反馈、下一题和持久化仍只由训练页面与 adaptive service 处理。训练结束可查看本次结果、查看学习画像和继续个性化推荐。function_v1 继续进入保留的旧版训练。
+
+services/math_text.py 提供统一、仅用于显示的数学渲染，推荐、训练和诊断共享使用：如 9^(a)、3^(2a+b)、log_(3)4、a_(n)、sqrt(x+1)、root(3,x+1) 转为行内 LaTeX。保留普通中文和现有 LaTeX；未知、残缺或歧义表达保持原文，不计算表达式、不改题目数学含义、不改原始数据。训练/诊断选项仍以字母提交，排版不影响评分。
+
+完整自动测试286项通过（新增13项），日志 tmp/recommendation_integration_tests.log。验收 reports/recommendation_training_integration_validation.json：真实库副本中，推荐→创建指定目标 session→连续作答3题成功，选项完整、目标一致、仅新增3次真实提交对应的测试 attempts；生产数据保持不变。真实服务各页面 HTTP 200，仍使用 app.py。
+# V1.0C：错因诊断、渐进提示与变式基础
+
+本阶段只使用本地 SQLite 和确定性 Python，不联网抓题，不扩展教师端或 V1.0D。
+
+- 运行 `python scripts/migrate_variation.py` 可添加新结构；训练页也会幂等初始化。
+- 运行 `streamlit run app.py`，使用 `function_v2` 训练页。旧 `function_v1` 页保留原行为。
+- 四个按钮分别提供方向、方法/知识点、关键步骤、完整解析；不再在提交后自动显示完整解析。每次点击产生一条 `training_hint_events`，计数保存于 session；提交 attempt 时保存当时的累计提示计数。提交后使用的提示记录在 session 事件中，不追改原作答快照。静态题使用知识点规则提示，模板题使用与参数配套的提示。
+- 错误后学生在“你觉得自己主要卡在哪里？”中自选 K/C/L/M/R/S，再点击“保存错因”。建议由作答时间、已用提示级别的规则产生，仅为建议；未选择时保留 NULL。学生选择写入当前错误 attempt，不改答案与正确性。
+- “再试一次”增加 session 和当前题的 retry_count；再次提交新增 attempt。第一次错误保留；重试不占新的训练题数，也不触发连续两道新题的升降难度。所有 attempts 仍交给原 mastery 服务计算，结束正确率按首次作答统计。
+- recent_question_ids 取最近30道不同已做题，重试不缩小窗口。同轮所有已曝光题不能再作为下一题。先选新题，再放宽难度（保留安全上限与前置门槛），之后才按较早历史优先回退。模板参数组合在近期曝光窗口内禁止回退重用。
+- 5个技术验证模板：二次函数对称轴、二次函数顶点、指数函数基本性质、根式定义域、幂函数奇偶性。分别映射新体系 K007/K007/K009/K002/K005；静态新题不足时才生成一个变式。参数为有限整数域；二次函数使用非零 a 与整数顶点参数，展开成 a,b,c。
+- generator 构造题干和选项；validator 使用展开系数的有理数计算或定义独立验证唯一正确选项。固定 seed 或 parameter_set 可复现。参数合法性、四个不同选项、标准答案、指纹均校验；训练提交前重新校验生成题。
+- variant_fingerprint 为 template_id + 排序后的参数 JSON 的 SHA-256，数据库 UNIQUE 保证参数组合只有一个题目身份。生成题保留 template_id、parameter_set、generator_version、提示和 generated_template 来源；沿用 approved 映射与现有推荐、前置知识机制。
+- source_url、license、usage_note 只预留于轻量来源元数据结构。以后网络资源必须明确来源与许可，进入 reviewed，人工审核并 approved 后才训练；本阶段没有抓取接口。
+
+验证：`python -m unittest discover -s tests -q`。新测试位于 `tests/test_variation_training.py`，使用临时数据库和 Streamlit AppTest，不需要 API 或网络。
+
+手工验收：开始训练 → 连点提示1/2/3/完整解析 → 故意答错 → 选择并保存错因 → 再试一次 → 提交正确答案 → 下一题 → 结束本轮，检查提示次数、重试次数和主要错误类型。刷新应恢复当前题与已保存计数；数据库应保留首次错误及重试两条记录。
+# V1.0D：多题型训练基础
+
+现有训练引擎支持 single_choice、fill_blank、subjective。填空题使用离线 SymPy 与确定性规则判分，主观题只保存文本/图片引用，未评分题不会影响掌握度。详细 schema、比例规则、导入边界与未来 OCR 流程见 [多题型说明](docs/multi_type_engine.md)。
+
+运行 `python scripts/migrate_multi_type.py` 幂等迁移，运行 `streamlit run app.py` 使用训练页。首批本地 DOCX 候选为25道填空、16道主观题，全部 reviewed，尚未导入正式训练。人工审核文件位于 `reports/function_fill_blank_batch_001_可读版.docx` 和 `reports/function_subjective_batch_001_可读版.docx`。
+
+## V1.0D.1：多题型待审题库扩充
+
+重新扫描全部15份本地DOCX，输出20道多选、35道填空、14道解答题，全部 reviewed。多选使用 correct_answers 集合判分；填空支持 canonical_answer 与有限实数 set；大题使用 sub_questions 和对应 rubric，未评分不影响掌握度。未调用 LLM、网络或 OCR。
+
+旧文件保留：新多选为 batch_001，新填空/解答为 batch_002。可直接打开 reports/function_multiple_choice_batch_001_可读版.docx、reports/function_fill_blank_batch_002_可读版.docx、reports/function_subjective_batch_002_可读版.docx 审核。22道填空与14道解答复用了此前尚未批准的来源题；不能把重新结构化计作正式新增 approved。
+
+候选与同名 review_required 文件一致。覆盖与缺口报告位于 reports/function_multitype_question_bank_report.md，临时库验收位于 reports/v1_0d_1_validation.json。只在隔离数据库升级四题型 schema、模拟导入和训练；真实数据库、approved 文件及历史 attempts 均保持不变。完整约束和命令见 [多题型说明](docs/multi_type_engine.md)。本阶段完成后等待人工 Word 审核，不自动批准或正式导入。
+
+## V1.0D.2：多题型正式训练
+
+用户审核的三份 batch_001 已批准并正式导入：多选20、填空25、主观16。当前正式题库133道，单选72道保留；batch_002 继续待审。运行 `python -m streamlit run app.py`，从首页进入“开始训练”。多选用多选控件、集合全对判分；填空用确定性数学 evaluator；大题显示小问和总分，保存文本或图片后待评阅。无法安全判分的填空保存为 needs_manual_review；待评填空和大题均不影响掌握度。
+
+训练按掌握度混合题型并回避近期原题，结束显示题型分布、已评分正确率和待评数量；画像区分有效证据和待评阅作答。图片只保存在忽略提交的 attachments/，不运行 OCR、不由 LLM 决定客观题正确性。
+
+SQLite一致性备份、导入数量与历史作答摘要见 reports/v1_0d_2_production_validation.json；原33条 attempts、原题和 function_v1 已验证保持完整。审核审计见 data/question_bank/reviews/function_multitype_batch_001_manual_user_audit.jsonl。全部离线测试命令仍为 `python -m unittest discover -s tests -q`。无需重跑 init_db 或迁移脚本。
+### V1.0D.3 多题型诊断与训练
+
+首次诊断默认18题，优先覆盖K001–K015，目标题型为单选6、多选2、填空7、解答3。页面使用对应作答控件，确定性判分与待评阅结果分开统计。旧未完成诊断会保留已答记录并升级剩余题池。
+
+自适应训练按掌握度、会话题型缺口、前置知识、难度与最近30题曝光选择下一题，降低选择题比例。未评分大题和需人工审核的填空只保存，不影响掌握度或即时难度。详见 [V1.0D.3报告](reports/function_multitype_diagnostic_adaptive_report.md)。
+
+### V1.0D.4 数学公式规范与清洗
+
+题目统一使用普通文本与单美元包围的标准LaTeX片段，学生页面共用 `render_math_text`。导入、选题和缓存恢复检查公式状态；只有 approved 且公式 valid 的题可训练。安全转换已应用于128题，5题因根式结构或表达式作用范围不确定而暂停训练，133题及历史学习记录保留。
+
+完整字段审计、修复计划和截图题来源追踪见 [公式清洗报告](reports/function_v2_math_formula_audit.md)。网页验收在隔离副本中完成18题诊断和10题训练；真实库修改前使用SQLite backup API备份，attempts与掌握画像摘要均不变。运行 `python -m unittest discover -s tests` 验证离线回归；审计脚本默认只生成计划，正式应用需要显式生产授权参数。

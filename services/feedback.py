@@ -23,6 +23,7 @@ FEEDBACK_INSTRUCTIONS = """你只负责解释已有的高中数学学情结果�
 evidence_level 为数据较少时，即使 mastery_score=1，也不得声称完全掌握，必须说明表现好但证据有限。
 未评估表示尚未训练或验证，不表示能力差，不得解释成0分，不给学生贴负面标签。
 不得生成最终成绩、排名或能力等级。不要推测错因，不生成题目或答案，不生成自动学习计划。
+待评阅大题与待人工审核填空不表示错误，不参与掌握度；不得自行评分或改写 score、correctness、mastery。
 按以下五个标题依次输出：
 1. 本次学习表现
 2. 当前优势
@@ -43,6 +44,9 @@ def build_feedback_context(student_id: str, *, database_path: str | Path | None 
     if taxonomy_version is not None: kwargs['taxonomy_version']=taxonomy_version
     mastery = calculate_student_mastery(student_id, **kwargs)
     recommendation = generate_recommendation(student_id, **kwargs)
+    from database.training_review import pending_counts
+    from settings import get_active_taxonomy_version
+    pending = pending_counts(student_id,database_path=database_path,taxonomy_version=taxonomy_version or get_active_taxonomy_version())
     fields = ("knowledge_point_id", "knowledge_point_name", "mastery_score", "mastery_level",
               "attempt_count", "correct_count", "evidence_level", "overall_accuracy",
               "recent_accuracy", "stability", "difficulty_performance")
@@ -50,6 +54,8 @@ def build_feedback_context(student_id: str, *, database_path: str | Path | None 
                      "attempt_count", "evidence_level", "recommendation_type", "reason", "difficulty_range")
     return {
         "student_id": student_id, "topic": "函数",
+        "pending_work": {"subjective":sum(v.get('subjective',0) for v in pending.values()),
+                         "fill_blank":sum(v.get('fill_blank',0) for v in pending.values())},
         "knowledge_points": [{field: point[field] for field in fields} for point in mastery],
         "recommendation": {
             "target_knowledge": {field: recommendation["target_knowledge"][field] for field in target_fields},
@@ -79,6 +85,9 @@ def build_rule_based_feedback(context: dict) -> str:
     else:
         performance = f"函数专题已累计训练{count}次。下面仅解释已有学情结果，掌握度与证据量需要结合查看，不能据此给出正式成绩。"
     advantage = "、".join(strengths) + "当前表现较好。" if strengths else "目前仍需通过训练积累表现证据，暂不作优势判断。"
+    pending = context.get('pending_work',{})
+    if any(pending.values()):
+        performance += f"另有{pending.get('subjective',0)}道主观题待评阅、{pending.get('fill_blank',0)}道填空待人工审核，暂不计入掌握度。"
     if low_evidence:
         advantage += "但训练数据较少，建议继续通过练习验证，提高判断可靠性。"
     score = target["mastery_score"]
