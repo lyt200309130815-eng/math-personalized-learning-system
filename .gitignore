@@ -18,3 +18,65 @@ backups/
 student_submissions/
 data/student_submissions/
 ~$*
+# ==============================
+# Local runtime data
+# ==============================
+math_ai.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Temporary and backup files
+tmp/
+backups/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Raw question sources
+data/raw_sources/
+
+# Local/generated reports
+reports/*.docx
+# ==============================
+# Question bank working data
+# ==============================
+
+# Raw / intermediate question bank data
+data/question_bank/candidates/
+data/question_bank/reviews/
+data/question_bank/review_required/
+data/question_bank/formula_fixes/
+data/question_bank/mappings/
+
+# Production question bank
+data/question_bank/approved/
+
+# Source materials and generated mappings
+data/raw_sources/
+data/questions.csv
+data/source_mapping.json
+AGENTS.md
