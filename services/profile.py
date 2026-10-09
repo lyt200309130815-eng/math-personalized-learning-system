@@ -20,15 +20,18 @@ def build_profile_data(mastery_results: Sequence[dict], *, pending_by_point=None
         pending = (pending_by_point or {}).get(result['knowledge_point_id'],{})
         point['pending_subjective_count'] = pending.get('subjective',0)
         point['pending_fill_blank_count'] = pending.get('fill_blank',0)
-        point["mastery_display"] = format_percentage(result["mastery_score"])
+        point["mastery_display"] = result.get('mastery_display') or format_percentage(result["mastery_score"])
         point["metric_displays"] = {field: format_percentage(result[field]) for field in metric_fields}
+        if result.get('evidence_status') == 'insufficient':
+            point['mastery_level'] = '待进一步训练'
+            point['metric_displays']['mastery_score'] = point['mastery_display']
         point["evidence_note"] = (
             "当前表现较好，但训练数据较少，建议继续训练以提高判断可靠性。"
             if result["mastery_score"] is not None and result["mastery_score"] >= 0.80
             and result["evidence_level"] == "数据较少" else None
         )
         points.append(point)
-        if result["mastery_score"] is None:
+        if result["mastery_score"] is None or result.get('evidence_status') == 'insufficient':
             unevaluated.append(f"{result['knowledge_point_id']} {result['knowledge_point_name']}")
         else:
             chart.append({"知识点": f"{result['knowledge_point_id']} {result['knowledge_point_name']}",

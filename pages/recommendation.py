@@ -7,14 +7,14 @@ import streamlit as st
 from services.profile import format_percentage
 from services.recommendation import generate_recommendation
 from services.adaptive_training import start_training_session
-from settings import get_active_taxonomy_version
+from settings import get_active_taxonomy_version, get_topic_name
 from services.math_text import render_math_text
 
 
 st.title("个性化训练推荐")
 student_id = st.session_state.get("student_id", "S001")
 st.write(f"当前学生：{student_id}")
-st.write("当前专题：函数")
+st.write("当前专题：" + get_topic_name())
 try:
     recommendation = generate_recommendation(student_id)
 except (sqlite3.Error, ValueError, FileNotFoundError):
@@ -27,11 +27,13 @@ st.write(f"推荐类型：{target['recommendation_type']}")
 render_math_text(f"推荐理由：{target['reason']}")
 with st.expander('为什么推荐这里？'):
     st.write(target['reason'])
-st.write(f"当前掌握度：{format_percentage(target['mastery_score'])}")
+st.write(f"当前掌握度：{target.get('mastery_display') or format_percentage(target['mastery_score'])}")
 st.write(f"证据量：{target['evidence_level']}")
 st.caption(f"建议难度：{target['difficulty_range'][0]}–{target['difficulty_range'][1]}；推荐由确定性规则生成。")
+for note in recommendation.get('coverage_limitations', []):
+    st.info(note)
 st.write('建议训练：5题，系统根据表现动态调整，最多8题；缺题时可能提前结束。')
-if get_active_taxonomy_version() == 'function_v2':
+if get_active_taxonomy_version() != 'function_v1':
     if st.button('开始推荐训练', type='primary', disabled=not recommendation['recommended_questions']):
         try:
             session = start_training_session(student_id, target_knowledge_point_id=target['knowledge_point_id'],

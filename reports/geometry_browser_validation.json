@@ -1,0 +1,231 @@
+{
+  "result": "PASS",
+  "folder": "E:\\Projects\\math_ai\\tmp\\geometry_browser_20261008T150351975965Z",
+  "diagnostic_count": 15,
+  "diagnostic_type_counts": {
+    "single_choice": 5,
+    "fill_blank": 6,
+    "multiple_choice": 2,
+    "subjective": 2
+  },
+  "diagnostic_knowledge_coverage": [
+    "G001",
+    "G002",
+    "G003",
+    "G004",
+    "G005",
+    "G006",
+    "G007",
+    "G008",
+    "G009",
+    "G010"
+  ],
+  "diagnostic_submissions": [
+    {
+      "diagnostic_index": 1,
+      "question_id": "GQ-5a0809bb71b3929b2c7e",
+      "type": "single_choice",
+      "katex_errors": [],
+      "math_count": 6
+    },
+    {
+      "diagnostic_index": 2,
+      "question_id": "GQ-002b3baad92884d4f8e5",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 4
+    },
+    {
+      "diagnostic_index": 3,
+      "question_id": "GQ-1db6c10b3f448db73138",
+      "type": "single_choice",
+      "katex_errors": [],
+      "math_count": 0
+    },
+    {
+      "diagnostic_index": 4,
+      "question_id": "GQ-151b0528f8ae8a33c2bc",
+      "type": "multiple_choice",
+      "katex_errors": [],
+      "math_count": 5
+    },
+    {
+      "diagnostic_index": 5,
+      "question_id": "GQ-12278a7ed57a2af16f77",
+      "type": "subjective",
+      "katex_errors": [],
+      "math_count": 8
+    },
+    {
+      "diagnostic_index": 6,
+      "question_id": "GQ-148ebe88f26537ba5829",
+      "type": "single_choice",
+      "katex_errors": [],
+      "math_count": 14
+    },
+    {
+      "diagnostic_index": 7,
+      "question_id": "GQ-11fc0a419a885602540f",
+      "type": "single_choice",
+      "katex_errors": [],
+      "math_count": 3
+    },
+    {
+      "diagnostic_index": 8,
+      "question_id": "GQ-ddfae3124c26a1e4e165",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 2
+    },
+    {
+      "diagnostic_index": 9,
+      "question_id": "GQ-5311990e27f56e5d22f6",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 4
+    },
+    {
+      "diagnostic_index": 10,
+      "question_id": "GQ-d072168a6a2b4618193b",
+      "type": "multiple_choice",
+      "katex_errors": [],
+      "math_count": 29
+    },
+    {
+      "diagnostic_index": 11,
+      "question_id": "GQ-31d1653825585036a8aa",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 6
+    },
+    {
+      "diagnostic_index": 12,
+      "question_id": "GQ-0cc7274a630c28a8ad26",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 16
+    },
+    {
+      "diagnostic_index": 13,
+      "question_id": "GQ-04596702baf31dee43a0",
+      "type": "fill_blank",
+      "katex_errors": [],
+      "math_count": 7
+    },
+    {
+      "diagnostic_index": 14,
+      "question_id": "GQ-02c40d2a9ed597ab3b4b",
+      "type": "subjective",
+      "katex_errors": [],
+      "math_count": 11
+    },
+    {
+      "diagnostic_index": 15,
+      "question_id": "GQ-02d8239d414229002960",
+      "type": "single_choice",
+      "katex_errors": [],
+      "math_count": 12
+    }
+  ],
+  "image_scenarios": [
+    {
+      "scenario": "no_diagram_choice",
+      "question_id": "GQ-06a36c33278d4f63f79d",
+      "question_images_before": 0,
+      "solution_images_before": 0,
+      "solution_images_after": 0,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 6
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 10
+      }
+    },
+    {
+      "scenario": "diagram_choice",
+      "question_id": "GQ-02d8239d414229002960",
+      "question_images_before": 1,
+      "solution_images_before": 0,
+      "solution_images_after": 0,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 4
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 13
+      }
+    },
+    {
+      "scenario": "fill_blank",
+      "question_id": "GQ-002b3baad92884d4f8e5",
+      "question_images_before": 0,
+      "solution_images_before": 0,
+      "solution_images_after": 0,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 0
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 0
+      }
+    },
+    {
+      "scenario": "subjective",
+      "question_id": "GQ-54b229d664256186e115",
+      "question_images_before": 1,
+      "solution_images_before": 0,
+      "solution_images_after": 2,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 1
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 21
+      }
+    },
+    {
+      "scenario": "multi_diagram",
+      "question_id": "GQ-1db6c10b3f448db73138",
+      "question_images_before": 2,
+      "solution_images_before": 0,
+      "solution_images_after": 2,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 0
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 1
+      }
+    },
+    {
+      "scenario": "solution_only",
+      "question_id": "GQ-02c40d2a9ed597ab3b4b",
+      "question_images_before": 0,
+      "solution_images_before": 0,
+      "solution_images_after": 1,
+      "pre": {
+        "katex_errors": [],
+        "math_count": 5
+      },
+      "post": {
+        "katex_errors": [],
+        "math_count": 13
+      }
+    }
+  ],
+  "function_pages_passed": [
+    "首次诊断",
+    "开始训练",
+    "学习画像",
+    "个性化推荐",
+    "AI 学习反馈"
+  ],
+  "production_attempts_unchanged": true,
+  "database": "E:\\Projects\\math_ai\\tmp\\geometry_browser_20261008T150351975965Z\\browser.sqlite3"
+}

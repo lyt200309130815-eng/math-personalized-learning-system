@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from database.database import get_connection
-from settings import get_database_path
+from settings import get_database_path, get_active_taxonomy_version
 
 
 def ensure_schema(database_path=None):
@@ -27,14 +27,14 @@ def ensure_schema(database_path=None):
             ON diagnostic_sessions(student_id, taxonomy_version) WHERE completed=0''')
 
 
-def load_latest(student_id, database_path=None):
+def load_latest(student_id, database_path=None, *, taxonomy_version=None):
     """Reading the landing page must not create tables or write records."""
     with closing(get_connection(database_path, read_only=True)) as conn:
         if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='diagnostic_sessions'").fetchone():
             return None
         row = conn.execute('''SELECT state_json FROM diagnostic_sessions
-            WHERE student_id=? AND taxonomy_version='function_v2'
-            ORDER BY rowid DESC LIMIT 1''', (student_id,)).fetchone()
+            WHERE student_id=? AND taxonomy_version=?
+            ORDER BY rowid DESC LIMIT 1''', (student_id, taxonomy_version or get_active_taxonomy_version())).fetchone()
     return json.loads(row[0]) if row else None
 
 

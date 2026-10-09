@@ -92,13 +92,13 @@ python -c "import json; from services.recommendation import generate_recommendat
 
 侧栏“AI 学习反馈”先展示确定性数据，只有点击“生成 AI 学习反馈”或“重新生成”才调用当前配置的大模型服务。AI 只解释优势、待提升内容和已有推荐，不计算掌握度、正确率、等级，不决定推荐目标、题目或前置关系。文本仅作学习参考，约 250–450 中文字，包含五个固定部分。
 
-使用 `LLM_PROVIDER` 切换 `deepseek`（默认）与 `openai`，并保留已有 `gemini` 支持。DeepSeek 使用 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，默认 `deepseek-flash`；Gemini 使用 `GEMINI_API_KEY`、`GEMINI_MODEL`，默认 `gemini-3.8-flash`；OpenAI 使用 `OPENAI_API_KEY`、`OPENAI_MODEL`，保留默认 `gpt-4.1-mini`。模型集中定义在 `services/llm_provider.py`，模板在 `.env.example`。统一接口 `generate_text(prompt)` 隔离官方 SDK，未来可通过同一适配器接口扩展 provider；当前不实现 groq/ollama。当前直接读取进程环境变量，不自动加载 `.env`，无需 python-dotenv。不要将真实密钥放入源码、文档或 Git。
+使用 `LLM_PROVIDER` 切换 `deepseek`（默认）与 `openai`，并保留已有 `gemini` 支持。DeepSeek 使用 `DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL`，默认 `deepseek-flash`；Gemini 使用 `GEMINI_API_KEY`、`GEMINI_MODEL`，默认 `gemini-3.8-flash`；OpenAI 使用 `OPENAI_API_KEY`、`OPENAI_MODEL`，保留默认 `gpt-4.1-mini`。模型集中定义在 `services/llm_provider.py`，模板在 `.env.example`。统一接口 `generate_text(prompt)` 隔离官方 SDK，未来可通过同一适配器接口扩展 provider；当前不实现 groq/ollama。通过 `python-dotenv` 在启动时自动加载项目根目录 `E:\Projects\math_ai\.env`，与快捷方式的工作目录无关；系统/进程环境变量优先（`override=False`）。不要将真实密钥放入源码、文档或 Git。
 
-没有当前 provider 的密钥时显示对应的“尚未配置 DeepSeek AI 服务。”等提示，训练、画像和推荐仍可正常运行，并可点击“查看规则式学习反馈”。网络、超时或 API 错误时显示安全提示并使用规则反馈。请求超时 20 秒，SDK 自动重试关闭，避免隐式重复请求。
+没有当前 provider 的密钥时显示“DeepSeek尚未配置。”或对应服务未配置提示，训练、画像和推荐仍可正常运行，并可点击“查看规则式学习反馈”。网络、超时或 API 错误时显示安全提示并使用规则反馈。请求超时 20 秒，SDK 自动重试关闭，避免隐式重复请求。
 
 生成结果保存在会话中，普通 rerun 不调用 API；学情、推荐数据、provider 或模型变化会清除旧结果，需再次明确点击生成。只发送必要的知识点指标和推荐摘要，不发送原始作答、SQL、数据库路径或密钥；OpenAI 请求使用 `store=False`。AI 输出不会写回数据库或确定性服务。
 
-测试通过 mock SDK 进行，不调用真实 API。安装依赖后启动：`python -m streamlit run app.py`。真实 API 验证请自行配置环境变量后手动点击按钮。
+测试通过 mock SDK 进行，不调用真实 API。安装依赖后启动：`python -m streamlit run app.py`。在本地 `.env` 中一次性填写 `DEEPSEEK_API_KEY`，并可设置 `LLM_PROVIDER=deepseek`、`ACTIVE_TAXONOMY_VERSION=function_v2`。之后双击已有桌面启动快捷方式即可，无需每次执行 PowerShell 环境变量命令；修改 `.env` 后重启系统。`.env` 不存在时系统仍能启动，无密钥时可查看规则式反馈；函数和几何使用同一 provider 配置。`.env.example` 仅提供空的 `DEEPSEEK_API_KEY=` 模板，真实密钥不得写入文档、日志或 Git。
 
 DeepSeek 复用 OpenAI SDK，连接 `https://api.deepseek.com`，调用 `chat.completions.create` 并读取 `choices[0].message.content`，不安装专用 SDK。只有手动运行 `python scripts/smoke_test_deepseek.py` 才进行连接冒烟测试，不自动运行。
 
@@ -317,3 +317,62 @@ SQLite一致性备份、导入数量与历史作答摘要见 reports/v1_0d_2_pro
 题目统一使用普通文本与单美元包围的标准LaTeX片段，学生页面共用 `render_math_text`。导入、选题和缓存恢复检查公式状态；只有 approved 且公式 valid 的题可训练。安全转换已应用于128题，5题因根式结构或表达式作用范围不确定而暂停训练，133题及历史学习记录保留。
 
 完整字段审计、修复计划和截图题来源追踪见 [公式清洗报告](reports/function_v2_math_formula_audit.md)。网页验收在隔离副本中完成18题诊断和10题训练；真实库修改前使用SQLite backup API备份，attempts与掌握画像摘要均不变。运行 `python -m unittest discover -s tests` 验证离线回归；审计脚本默认只生成计划，正式应用需要显式生产授权参数。
+
+### V1.1C 立体几何与空间向量正式训练
+
+本阶段已完成正式导入123道立体几何题，正式题库共256道；原函数题池及79条历史作答保持完整。首页或侧栏可切换“函数”和“立体几何与空间向量”，诊断、训练、画像、推荐及反馈按专题隔离。
+
+题干图和选项图在作答前显示，解析图在提交后查看解析时显示。必需题图缺失或损坏的题会跳过；待修复的99道候选不进入正式训练。主观题继续保存作答并等待人工评阅。
+
+启动命令：`python -m streamlit run app.py`。无需重新初始化或导入题库。完整验收记录见 [V1.1C正式导入报告](reports/geometry_v1_1c_production_report.md)，批准题目与图形可查看 [Word预览](reports/geometry_production_approved_preview.docx)。离线回归命令：`python -X utf8 -m unittest discover -s tests -q`。
+
+### V1.1D 覆盖审计与几何训练质量
+
+正式geometry_v1题池仍为123题。二次恢复仅处理原99条needs_manual_fix候选；98条成功恢复并分段为113道独立练习，1条特殊字体字形不明确而继续阻断。恢复题全部reviewed、待人工确认；不自动批准或正式导入。
+
+几何训练使用D1/D2、D2/D3、D3/D4、D4/D5的掌握度梯度并报告缺题；诊断默认15题，少量独立证据显示“证据不足 / 待进一步训练”。选题用来源位置和内容指纹回避同一原题及近期曝光。函数流程保留原规则。
+
+查看[覆盖审计](reports/geometry_v1_1d_coverage_audit.md)、[恢复审核Word](reports/geometry_recovery_batch_001_可读版.docx)及[最终报告](reports/geometry_v1_1d_final_report.md)。离线恢复命令为`python -X utf8 scripts/recover_geometry_batch.py`，该脚本只读正式库并输出审核资料，没有production import选项。
+
+
+## Streamlit Community Cloud Deployment
+
+唯一入口是 `app.py`。本地继续运行：
+
+```sh
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+使用 Python 3.11（本地验证环境）部署。运行依赖列在 requirements.txt，不含测试工具。
+
+1. 将代码、requirements.txt、`data/deployment/question_bank.db` 和 `data/question_assets/images/` push 到 GitHub。先审查待上传文件，勿上传学生记录或原始素材。
+2. 登录 https://share.streamlit.io 。
+3. 点击 Create app。
+4. 选择 GitHub repository。
+5. branch 选择 `main`。
+6. entrypoint 填写 `app.py`。
+7. 打开 Advanced settings / Secrets。
+8. 添加以下 TOML 示例，并将占位符替换为自己的 DeepSeek Key：
+
+```toml
+LLM_PROVIDER = "deepseek"
+DEEPSEEK_API_KEY = "your-key"
+ACTIVE_TAXONOMY_VERSION = "function_v2"
+```
+
+9. 点击 Deploy。
+10. 获取固定的 `https://<app-name>.streamlit.app` URL，手机、平板及其他电脑均可通过浏览器访问。侧栏“部署健康检查”显示数据库、两专题题库、题图及 DeepSeek 配置布尔状态，不显示 Key。
+
+官方步骤：https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy
+Secrets 说明：https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management
+
+配置统一通过 `settings.get_setting` 读取，优先级为进程环境变量 > Streamlit st.secrets > 项目根目录 .env > 默认值。本地 .env 继续有效；`.streamlit/secrets.toml` 被 Git 忽略，config.toml 不含密钥。空环境变量可显式禁用对应配置。
+
+`data/deployment/question_bank.db` 是不含学生记录的基础题库；`scripts/prepare_cloud_database.py` 从本地数据库导出并清空所有非题库表，不改动本地数据库。已有导出文件时脚本拒绝覆盖，更新前需要审查。首次启动缺少 math_ai.db 时复制基础题库为运行数据库；已有本地数据库保持原样。
+
+**SQLite 云端限制：** Community Cloud 本地文件不应当作可靠的长期多人持久化存储。答题、诊断和训练记录仍写入运行 SQLite，但重启、重新部署或实例替换后可能丢失，不保证持久化。临时 Streamlit session 也会结束。当前学生编号不是身份认证，不适合承载正式多人私密学习数据。
+
+数据库访问保留在 database 层。预留 `DATABASE_URL`，当前仅接受 `sqlite:///相对路径` 或 SQLite 绝对路径；非 SQLite URL 明确报错，未来可在数据库层接入 PostgreSQL。本阶段没有迁移。
+
+不上传目录包括 backups/、tmp/、data/raw_sources/、data/student_submissions/、__pycache__/；.env、*.pyc、本地数据库及 secrets.toml 同样被忽略。部署题库是明确例外。正式题图使用项目根目录相对路径，必须随代码上传。

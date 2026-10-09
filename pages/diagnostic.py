@@ -4,14 +4,14 @@ import streamlit as st
 
 from services.diagnostic import GROUPS, restore_diagnostic, start_diagnostic, submit_diagnostic_answer
 from services.profile import format_percentage
-from settings import get_active_taxonomy_version, get_database_path
+from settings import get_active_taxonomy_version, get_database_path, get_topic_name
 from services.math_text import math_markdown, render_math_text
-from services.question_renderer import render_question, render_answer_input, read_answer_input, TYPE_NAMES
+from services.question_renderer import render_question, render_answer_input, read_answer_input, render_solution, TYPE_NAMES
 
-st.title('函数知识诊断测评')
-st.write('测评包含选择题、填空题和解答题，用于从不同角度了解你的函数知识掌握情况。')
-st.caption('预计题量：18题 · 预计时间：约20–30分钟')
-if get_active_taxonomy_version() != 'function_v2':
+st.title(get_topic_name() + '知识诊断测评')
+st.write('测评包含选择题、填空题和解答题，用于从不同角度了解你的知识掌握情况。')
+st.caption('预计题量：' + ('15题' if get_active_taxonomy_version() == 'geometry_v1' else '18题') + ' · 预计时间：约20–30分钟')
+if get_active_taxonomy_version() == 'function_v1':
     st.info('首次诊断适用于函数新知识体系，请切换到 function_v2；旧版训练仍可使用。')
     st.stop()
 student_id = st.session_state.get('student_id', 'S001')
@@ -23,7 +23,7 @@ try:
         else:
             st.stop()
     elif state['diagnostic_completed']:
-        st.info('你已经完成过一次函数诊断。')
+        st.info('你已经完成过一次' + get_topic_name() + '诊断。')
         left, right = st.columns(2)
         if left.button('查看上次结果'):
             st.session_state.diagnostic_show_result = True
@@ -40,7 +40,10 @@ if not state['diagnostic_completed']:
     st.subheader(f"第 {state['question_index'] + 1} / {state['max_questions']} 题")
     st.progress(state['question_index'] / max(1, state['max_questions']))
     st.caption(TYPE_NAMES[q.get('question_type', 'single_choice')] + '题')
-    render_question(st,q)
+    if not render_question(st,q):
+        from services.diagnostic import _upgrade_active
+        _upgrade_active(state, None)
+        st.rerun()
     widget_key = f"diagnostic_answer_{state['id']}_{q['id']}"
     render_answer_input(st,q,widget_key)
     answer,payload = read_answer_input(st,q,widget_key)
@@ -64,6 +67,12 @@ if not state['diagnostic_completed']:
             st.info('答案已记录，暂需人工审核，不计入掌握度；你可以继续诊断。')
         else:
             st.success('回答已记录')
+    if state['answers']:
+        last = state['answers'][-1]
+        with st.expander('查看上一题解析'):
+            previous = next((p for p in state['pool'] if p['id'] == last['question_id']), None)
+            if previous:
+                render_solution(st, previous, submitted=True)
     st.stop()
 
 st.success('诊断完成')
@@ -77,12 +86,13 @@ st.write(f"自动评分部分：完成 {scored_total} 道，正确 {result['corr
 st.write(f"解答题：已提交 {result.get('question_type_counts', {}).get('subjective', 0)} 道，待评阅 {result.get('pending_subjective', 0)} 道。")
 if result.get('pending_fill_blank'):
     st.info(f"另有 {result['pending_fill_blank']} 道填空答案需要人工审核，暂不计入掌握度。")
-st.subheader('15知识点初始画像')
+st.subheader(('10' if get_active_taxonomy_version() == 'geometry_v1' else '15') + '知识点初始画像')
 st.caption('这是自动评分部分生成的初步画像，包含已有历史证据；待主观题完成评分后，画像还可以进一步更新。')
-for group, keys in GROUPS.items():
+groups = {'立体几何与空间向量': [f'G{i:03}' for i in range(1, 11)]} if get_active_taxonomy_version() == 'geometry_v1' else GROUPS
+for group, keys in groups.items():
     st.subheader(group)
-    rows = [dict(知识点=p['knowledge_point_name'], 掌握度=format_percentage(p['mastery_score']),
-                 掌握等级=p['mastery_level'], 证据量=p['evidence_level'], 作答次数=p['attempt_count'])
+    rows = [dict(知识点=p['knowledge_point_name'], 掌握度=p.get('mastery_display') or format_percentage(p['mastery_score']),
+                 掌握等级='待进一步训练' if p.get('evidence_status') == 'insufficient' else p['mastery_level'], 证据量=p['evidence_level'], 作答次数=p['attempt_count'])
             for p in result['profile'] if p['knowledge_point_id'] in keys]
     st.dataframe(rows, hide_index=True, use_container_width=True)
 for label, items in result['explanations'].items():

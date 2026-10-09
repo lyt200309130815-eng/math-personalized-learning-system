@@ -18,6 +18,7 @@ from services.question_validator import validate_question_type
 from services.question_variation import create_runtime_question, validate_variant
 from services.mastery import calculate_knowledge_mastery
 from services.recommendation import generate_recommendation, recommend_next_knowledge, recommend_questions
+from settings import get_active_taxonomy_version
 
 COVERAGE_MESSAGE = '当前知识点适合你的新题暂时不足，系统建议调整训练目标。'
 
@@ -25,6 +26,9 @@ COVERAGE_MESSAGE = '当前知识点适合你的新题暂时不足，系统建议
 def exposure_tokens(question):
     """Track IDs, content/variant identity and overlapping original paragraphs."""
     tokens={('id',question['id'])}
+    if question.get('taxonomy_version') == 'geometry_v1':
+        from services.geometry_quality import geometry_identity_tokens
+        tokens.update(geometry_identity_tokens(question))
     for field in ('source_fingerprint','variant_fingerprint'):
         if question.get(field):tokens.add((field,question[field]))
     file=question.get('source_file');locator=question.get('source_locator','') or ''
@@ -53,18 +57,19 @@ def difficulty_band(difficulty):
     return [max(1, difficulty - 1), min(5, difficulty + 1)]
 
 
-def _kwargs(database_path):
-    return dict(database_path=database_path, taxonomy_version='function_v2')
+def _kwargs(database_path, taxonomy_version=None):
+    return dict(database_path=database_path, taxonomy_version=taxonomy_version or get_active_taxonomy_version())
 
 
-def _target(student_id, key, database_path):
-    return recommend_next_knowledge(student_id, knowledge_point_id=key, **_kwargs(database_path))
+def _target(student_id, key, database_path, taxonomy_version=None):
+    return recommend_next_knowledge(student_id, knowledge_point_id=key, **_kwargs(database_path, taxonomy_version))
 
 
-def start_training_session(student_id, taxonomy_version='function_v2', *,
+def start_training_session(student_id, taxonomy_version=None, *,
                            target_knowledge_point_id=None, database_path=None, lock_target=False):
     """Create/resume one active session; only recommendation chooses/resolves goals."""
-    if taxonomy_version != 'function_v2' or not student_id.strip():
+    taxonomy_version = taxonomy_version or get_active_taxonomy_version()
+    if taxonomy_version not in ('function_v2', 'geometry_v1') or not student_id.strip():
         raise ValueError('自适应训练需要有效学生编号和函数新知识体系。')
     migrate_multi_type(database_path)
     with closing(get_connection(database_path)) as conn, conn:
@@ -75,8 +80,8 @@ def start_training_session(student_id, taxonomy_version='function_v2', *,
             return load_session(conn, existing['id'], student_id)
         if lock_target and target_knowledge_point_id is None:
             raise ValueError('推荐训练必须指定知识点。')
-        target = (_target(student_id, target_knowledge_point_id, database_path) if target_knowledge_point_id else
-                  generate_recommendation(student_id, **_kwargs(database_path))['target_knowledge'])
+        target = (_target(student_id, target_knowledge_point_id, database_path, taxonomy_version) if target_knowledge_point_id else
+                  generate_recommendation(student_id, **_kwargs(database_path, taxonomy_version))['target_knowledge'])
         if lock_target and target['knowledge_point_id'] != target_knowledge_point_id:
             raise ValueError('学情已变化，请刷新推荐后再开始训练。')
         if existing:
@@ -84,7 +89,7 @@ def start_training_session(student_id, taxonomy_version='function_v2', *,
             if previous['target_knowledge_point_id'] == target_knowledge_point_id:
                 return previous
             previous['final_mastery'] = calculate_knowledge_mastery(
-                student_id, previous['target_knowledge_point_id'], **_kwargs(database_path))['mastery_score']
+                student_id, previous['target_knowledge_point_id'], **_kwargs(database_path, taxonomy_version))['mastery_score']
             _stop(previous, 'user_ended', '你已选择切换到推荐学习目标，原训练记录已保留。')
             save_session(conn, previous)
         state = dict(id=uuid4().hex, student_id=student_id, taxonomy_version=taxonomy_version,
@@ -114,14 +119,16 @@ def _stop(state, status, reason, next_target=None):
 
 def _eligible(state, database_path):
     previews = recommend_questions(state['student_id'], state['target_knowledge_point_id'],
-                                  limit=10000, **_kwargs(database_path))
+                                  limit=10000, **_kwargs(database_path, state['taxonomy_version']))
     allowed = {q['id'] for q in previews}
     with closing(get_connection(database_path,read_only=True)) as conn:
         templates = set()
         if conn.execute("SELECT 1 FROM sqlite_master WHERE name='question_templates'").fetchone():
             templates = {r[0] for r in conn.execute("SELECT template_id FROM question_templates WHERE quality_status='approved' AND version='1'")}
-    return [q for q in get_approved_questions(state['target_knowledge_point_id'], **_kwargs(database_path))
-            if q['id'] in allowed and not validate_question_type(q) and (q.get('source_type') != 'generated_template'
+    from services.geometry_curation import validate_geometry_question
+    validator = validate_geometry_question if state['taxonomy_version'] == 'geometry_v1' else validate_question_type
+    return [q for q in get_approved_questions(state['target_knowledge_point_id'], **_kwargs(database_path, state['taxonomy_version']))
+            if q['id'] in allowed and not validator(q) and (q.get('source_type') != 'generated_template'
                 or (q.get('template_id') in templates and validate_variant(q)))]
 
 
@@ -136,7 +143,7 @@ def get_next_question(student_id, session_id, *, database_path=None):
         state = load_session(conn, session_id, student_id)
         if state['status'] != 'active':
             return None
-        target = _target(student_id, state['target_knowledge_point_id'], database_path)
+        target = _target(student_id, state['target_knowledge_point_id'], database_path, state['taxonomy_version'])
         if target['knowledge_point_id'] != state['target_knowledge_point_id']:
             _stop(state, 'prerequisite_blocked', target['reason'], target)
             save_session(conn, state)
@@ -146,11 +153,28 @@ def get_next_question(student_id, session_id, *, database_path=None):
         if current and not state['submitted'] and any(q['id'] == current['id'] for q in eligible):
             return current
         used = {row[0] for row in conn.execute('SELECT question_id FROM training_session_questions WHERE session_id=?', (session_id,))}
-        mastery = calculate_knowledge_mastery(student_id, state['target_knowledge_point_id'], **_kwargs(database_path))
+        mastery = calculate_knowledge_mastery(student_id, state['target_knowledge_point_id'], **_kwargs(database_path, state['taxonomy_version']))
         cap = _difficulty_cap(mastery)
+        geometry_band = None
+        if state['taxonomy_version'] == 'geometry_v1':
+            from services.geometry_quality import geometry_difficulty_range
+            geometry_band = geometry_difficulty_range(mastery)
+            cap = min(cap, geometry_band[1])
+            state['difficulty'] = min(geometry_band[1], max(geometry_band[0], state['difficulty']))
+            state['preferred_difficulty_range'] = list(geometry_band)
+            available_levels = sorted({q['difficulty'] for q in eligible})
+            state['available_difficulties'] = available_levels
+            missing = [d for d in range(geometry_band[0], geometry_band[1]+1) if d not in available_levels]
+            if missing:
+                message = '题库覆盖不足（coverage limitation）：当前目标缺少' + '/'.join(f'D{d}' for d in missing) + '，不能验证相应难度的进阶表现。'
+                limits = state.setdefault('difficulty_coverage_limitation', [])
+                if message not in limits:
+                    limits.append(message)
         ratios = question_type_ratios(mastery['mastery_score'])
         remaining = [q for q in eligible if q['id'] not in used
                      and q['difficulty'] <= cap and ratios.get(q.get('question_type','single_choice'), ratios['single_choice'])>0]
+        if geometry_band:
+            remaining = [q for q in remaining if q['difficulty'] >= geometry_band[0]]
         history = list(conn.execute('SELECT question_id,MAX(id) AS last_id FROM attempts WHERE student_id=? GROUP BY question_id ORDER BY last_id DESC LIMIT 30', (student_id,)))
         recent = {r['question_id'] for r in history}
         ever_seen = {r[0] for r in conn.execute('SELECT DISTINCT question_id FROM attempts WHERE student_id=?', (student_id,))}
@@ -161,12 +185,12 @@ def get_next_question(student_id, session_id, *, database_path=None):
             FROM training_session_questions s JOIN training_sessions t ON t.id=s.session_id
             WHERE t.student_id=? GROUP BY s.question_id
             ORDER BY MAX(s.selected_at) DESC LIMIT 30''', (student_id,)))
-        identities={q['id']:exposure_tokens(q) for q in get_approved_questions(**_kwargs(database_path))}
+        identities={q['id']:exposure_tokens(q) for q in get_approved_questions(**_kwargs(database_path, state['taxonomy_version']))}
         def keys(ids):
             return set().union(*(identities.get(qid,{('id',qid)}) for qid in ids)) if ids else set()
         used_keys=keys(used);recent_keys=keys(recent);ever_keys=keys(ever_seen)
         remaining=[q for q in remaining if not exposure_tokens(q)&used_keys]
-        if not any(not exposure_tokens(q)&recent_keys for q in remaining) and cap == 2 and mastery['attempt_count'] >= 2 and (mastery['mastery_score'] or 0) >= .4:
+        if state['taxonomy_version'] == 'function_v2' and not any(not exposure_tokens(q)&recent_keys for q in remaining) and cap == 2 and mastery['attempt_count'] >= 2 and (mastery['mastery_score'] or 0) >= .4:
             # An exhausted basic pool may use its adjacent D3 level. This is
             # a question fallback, not an increase caused by a pending answer.
             adjacent = [q for q in eligible if q['id'] not in used and q['difficulty'] == 3
@@ -182,7 +206,13 @@ def get_next_question(student_id, session_id, *, database_path=None):
                      or q['id'] not in recent | exposed_variants]
         state['recent_question_ids'] = [r['question_id'] for r in history]
         fresh = [q for q in remaining if not exposure_tokens(q)&recent_keys]
-        if not fresh and conn.execute("SELECT 1 FROM question_knowledge_mappings WHERE taxonomy_version='function_v2' AND knowledge_point_id=? AND review_status='approved'",(state['target_knowledge_point_id'],)).fetchone():
+        if state['taxonomy_version'] == 'geometry_v1' and not fresh and remaining:
+            # A tiny geometry pool must not immediately replay another version
+            # of the same original question to manufacture new evidence.
+            _stop(state, 'coverage_limited', '题库覆盖不足（coverage limitation）：当前目标的可用原题均在最近30题曝光范围内，请改练其他目标或等待题库补充。')
+            save_session(conn, state)
+            return None
+        if state['taxonomy_version'] == 'function_v2' and not fresh and conn.execute("SELECT 1 FROM question_knowledge_mappings WHERE taxonomy_version='function_v2' AND knowledge_point_id=? AND review_status='approved'",(state['target_knowledge_point_id'],)).fetchone():
             generated = create_runtime_question(conn,state)
             if generated:
                 remaining.append(generated)
@@ -278,7 +308,7 @@ def submit_training_answer(student_id, session_id, question_id, user_answer, ans
         question = state['current_question']
         if state['status'] != 'active' or state['submitted'] or not question or question['id'] != question_id:
             raise ValueError('当前题目已变化，请刷新页面。')
-        target = _target(student_id, state['target_knowledge_point_id'], database_path)
+        target = _target(student_id, state['target_knowledge_point_id'], database_path, state['taxonomy_version'])
         if target['knowledge_point_id'] != state['target_knowledge_point_id']:
             _stop(state, 'prerequisite_blocked', target['reason'], target)
             save_session(conn, state)
@@ -322,7 +352,7 @@ def submit_training_answer(student_id, session_id, question_id, user_answer, ans
                          (cursor.lastrowid,submission_status,review_reason))
         if kind=='subjective':
             submission_status='submitted_pending_review'
-            if conn.execute("SELECT 1 FROM sqlite_master WHERE name='subjective_submissions'").fetchone():
+            if question.get('max_score') and conn.execute("SELECT 1 FROM sqlite_master WHERE name='subjective_submissions'").fetchone():
                 conn.execute('''INSERT INTO subjective_submissions(student_id,question_id,attempt_id,
                     text_answer,attachment_path,status,max_score) VALUES (?,?,?,?,?,?,?)''',
                     (student_id,question_id,cursor.lastrowid,user_answer,payload.get('attachment_path'),
@@ -339,7 +369,7 @@ def submit_training_answer(student_id, session_id, question_id, user_answer, ans
         state['question_type_counts'] = {k:counts[k] for k in ('single_choice','multiple_choice','fill_blank','subjective')}
         for k,v in state['question_type_counts'].items(): state[k+'_count'] = v
         mastery = calculate_knowledge_mastery(student_id, state['target_knowledge_point_id'],
-                                             connection=conn, **_kwargs(database_path))
+                                             connection=conn, **_kwargs(database_path, state['taxonomy_version']))
         state.update(submitted=True, final_mastery=mastery['mastery_score'], mastery=mastery,
                      current_question=question)
         if correct is None:
@@ -361,7 +391,7 @@ def end_training_session(student_id, session_id, *, database_path=None):
         conn.execute('BEGIN IMMEDIATE')
         state = load_session(conn, session_id, student_id)
         if state['status'] == 'active':
-            mastery = calculate_knowledge_mastery(student_id, state['target_knowledge_point_id'], **_kwargs(database_path))
+            mastery = calculate_knowledge_mastery(student_id, state['target_knowledge_point_id'], **_kwargs(database_path, state['taxonomy_version']))
             state['final_mastery'] = mastery['mastery_score']
             _stop(state, 'user_ended', '你已主动结束本轮训练。')
             save_session(conn, state)
@@ -377,7 +407,7 @@ def get_training_session_summary(session_id, *, student_id=None, database_path=N
     correct = sum(a['is_correct'] for a in scored_answers)
     from collections import Counter
     errors = Counter(a.get('error_type') for a in state['answers'] if a.get('error_type'))
-    recommendation = generate_recommendation(state['student_id'], **_kwargs(database_path))
+    recommendation = generate_recommendation(state['student_id'], **_kwargs(database_path, state['taxonomy_version']))
     return dict(session_id=session_id, status=state['status'], target_name=state['target_name'],
                 target_knowledge_point_id=state['target_knowledge_point_id'], total=total, correct=correct,
                 accuracy=correct / len(scored_answers) if scored_answers else None, scored_total=len(scored_answers),
@@ -388,6 +418,8 @@ def get_training_session_summary(session_id, *, student_id=None, database_path=N
                 final_mastery=state['final_mastery'], actual_difficulties=[a['difficulty'] for a in state['answers']],
                 suggested_difficulties=state['difficulty_changes'], stop_reason=state['stop_reason'],
                 decision_notes=state['decision_notes'], recommendation=recommendation,
+                difficulty_coverage_limitation=state.get('difficulty_coverage_limitation', []),
+                type_coverage_limitation=state.get('type_coverage_limitation', []),
                 prerequisite_suggestion=state['next_target'], hint_count=state.get('hint_count',0),
                 retry_count=state.get('retry_count',0), error_types=dict(errors),
                 main_error_types=[k for k,v in errors.items() if v==max(errors.values())] if errors else [])

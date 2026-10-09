@@ -6,6 +6,7 @@ import sqlite3
 
 import streamlit as st
 from services.math_text import render_math_text
+from settings import get_topic_name
 
 from services.feedback import (
     AIFeedbackUnavailable, build_feedback_context, build_rule_based_feedback, generate_learning_feedback,
@@ -17,7 +18,7 @@ from services.llm_provider import get_provider_config
 st.title("AI 学习反馈")
 student_id = st.session_state.get("student_id", "S001")
 st.write(f"当前学生：{student_id}")
-st.write("专题：函数")
+st.write("专题：" + get_topic_name())
 st.caption("反馈仅解释已有结果，不参与掌握度计算或推荐决策。")
 try:
     context = build_feedback_context(student_id)
@@ -48,7 +49,8 @@ if st.session_state.get("feedback_fingerprint") != fingerprint:
 
 has_key = provider_config["configured"]
 if not has_key:
-    st.info(f"尚未配置 {provider_config['name']} AI 服务。")
+    st.info('DeepSeek尚未配置。' if provider_config['provider'] == 'deepseek'
+            else f"尚未配置 {provider_config['name']} AI 服务。")
 label = "重新生成" if st.session_state.learning_feedback else "生成 AI 学习反馈"
 if st.button(label, disabled=not has_key):
     st.session_state.learning_feedback_error = None

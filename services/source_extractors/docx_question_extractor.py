@@ -109,7 +109,7 @@ def _math(node):
     raise ValueError(f"OMML结构暂不支持：{tag}")
 
 
-def read_docx_blocks(path: str | Path) -> list[dict]:
+def read_docx_blocks(path: str | Path, *, math_converter=None) -> list[dict]:
     """Return ordered paragraphs, including table cell paragraphs and XML locators."""
     path = Path(path)
     if path.name.startswith("~$"):
@@ -128,7 +128,7 @@ def read_docx_blocks(path: str | Path) -> list[dict]:
             def render(node):
                 if node.tag in {M + "oMath", M + "oMathPara"}:
                     try:
-                        return _math(node)
+                        return (math_converter or _math)(node)
                     except (ValueError, AttributeError, TypeError):
                         warnings.append("包含无法可靠转换的 OMML 公式")
                         return "[公式待核]"

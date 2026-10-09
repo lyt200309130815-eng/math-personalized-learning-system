@@ -46,13 +46,13 @@ def pending_counts(student_id, *, database_path=None, taxonomy_version='function
     """Separate pending work from effective evidence; no scores are calculated."""
     with closing(get_connection(database_path,read_only=True)) as c:
         if not c.execute("SELECT 1 FROM sqlite_master WHERE name='attempt_details'").fetchone():return {}
-        if taxonomy_version=='function_v2':
+        if taxonomy_version!='function_v1':
             query='''SELECT m.knowledge_point_id AS point,q.question_type,COUNT(*) AS count
                 FROM attempts a JOIN questions q ON q.id=a.question_id
                 JOIN attempt_details d ON d.attempt_id=a.id
                 JOIN question_knowledge_mappings m ON m.question_id=q.id
                 WHERE a.student_id=? AND d.scoring_status='pending'
-                AND m.taxonomy_version='function_v2' AND m.role='primary' AND m.review_status='approved'
+                AND m.taxonomy_version=? AND m.role='primary' AND m.review_status='approved'
                 GROUP BY point,q.question_type'''
         else:
             query='''SELECT q.knowledge_point_id AS point,q.question_type,COUNT(*) AS count
@@ -60,6 +60,6 @@ def pending_counts(student_id, *, database_path=None, taxonomy_version='function
                 JOIN attempt_details d ON d.attempt_id=a.id WHERE a.student_id=?
                 AND d.scoring_status='pending' GROUP BY point,q.question_type'''
         result={}
-        for r in c.execute(query,(student_id,)):
+        for r in c.execute(query,(student_id, taxonomy_version) if taxonomy_version != 'function_v1' else (student_id,)):
             result.setdefault(r['point'],{'subjective':0,'fill_blank':0})[r['question_type']]=r['count']
         return result

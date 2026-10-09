@@ -9,7 +9,7 @@ import streamlit as st
 from database.database import get_knowledge_points
 from database.training_sessions import get_latest_session
 from database.multi_type import migrate_multi_type
-from services.question_renderer import render_answer_input, read_answer_input, render_question, render_feedback, TYPE_NAMES
+from services.question_renderer import render_answer_input, read_answer_input, render_question, render_feedback, render_solution, TYPE_NAMES
 from services.adaptive_training import (
     start_training_session, get_next_question, submit_training_answer,
     get_training_session, get_training_session_summary, end_training_session, difficulty_band,
@@ -18,7 +18,7 @@ from services.training_support import request_hint, retry_question, select_error
 from services.error_diagnosis import ERROR_LABELS, suggest_error
 from services.profile import format_percentage
 from services.recommendation import generate_recommendation
-from settings import get_active_taxonomy_version, get_database_path
+from settings import get_active_taxonomy_version, get_database_path, get_topic_name
 from services.math_text import math_markdown, render_math_text
 
 if get_active_taxonomy_version() == 'function_v1':
@@ -26,11 +26,11 @@ if get_active_taxonomy_version() == 'function_v1':
     st.stop()
 
 student_id = st.session_state.get('student_id', 'S001')
-context = (student_id, str(get_database_path()))
+context = (student_id, str(get_database_path()), get_active_taxonomy_version())
 if st.session_state.get('adaptive_context') != context:
     st.session_state.adaptive_context = context
     st.session_state.adaptive_error = None
-st.title('自适应函数训练')
+st.title('自适应' + get_topic_name() + '训练')
 st.caption('每轮围绕一个主要知识点混合练习不同题型；确定性判分后更新掌握度，待评阅作答只保存。通常5–8题。')
 
 
@@ -85,7 +85,7 @@ try:
     st.session_state.adaptive_training_state = state
     if st.session_state.get('adaptive_error'):
         st.warning(st.session_state.adaptive_error)
-    if state['submitted']:
+    def show_submission_feedback():
         render_feedback(st,state['answers'][-1])
         q = state['current_question']
         if state['answers'][-1]['is_correct'] == 0:
@@ -96,13 +96,11 @@ try:
             if st.button('保存错因', disabled=chosen_error is None):
                 select_error_type(student_id,state['id'],chosen_error)
                 st.rerun()
-            if st.button('再试一次'):
-                retry_question(student_id,state['id'])
-                st.rerun()
+            st.button('再试一次', on_click=retry_question, args=(student_id, state['id']))
         st.caption('当前掌握度：' + format_percentage(state['final_mastery']))
     if state['current_question'] and state['status'] in ('active','completed','needs_support'):
         for level,label in enumerate(['提示1','提示2','提示3','查看完整解析'],1):
-            if st.button(label):
+            if st.button(label, disabled=get_active_taxonomy_version() == 'geometry_v1' and level == 4 and not state['submitted']):
                 request_hint(student_id,state['id'],level)
                 st.rerun()
         if state.get('visible_hint'):
@@ -118,19 +116,33 @@ try:
         st.progress(question_count / 8)
         st.caption(state['target_reason'])
         q = state['current_question']
-        render_question(st,q)
+        if q is None:
+            st.info('当前没有满足条件的题目，请选择其他知识点。')
+            st.stop()
+        if not render_question(st,q):
+            get_next_question(student_id, state['id'])
+            st.rerun()
         st.caption(f"本题难度：{q['difficulty']}；{state['selection_note']}")
+        for note in state.get('difficulty_coverage_limitation', []):
+            st.info(note)
         key = f"adaptive_answer_{state['id']}_{q['id']}_{state.get('question_retry_count',0)}"
         render_answer_input(st,q,key,disabled=state['submitted'])
         st.caption(TYPE_NAMES[q.get('question_type','single_choice')] + '题')
         st.button('提交答案', on_click=submit_current, args=(state['id'], q['id'], key), disabled=state['submitted'])
         st.button('下一题', on_click=next_question, args=(state['id'],), disabled=not state['submitted'])
+        if state['submitted']:
+            show_submission_feedback()
+            render_solution(st, q, submitted=True)
         if st.session_state.get('adaptive_error'):
             st.button('重新选择题目', on_click=next_question, args=(state['id'],))
         if st.button('结束本轮训练'):
             end_training_session(student_id, state['id'])
             st.rerun()
     else:
+        if state['submitted'] and state['current_question']:
+            render_question(st, state['current_question'])
+            show_submission_feedback()
+            render_solution(st, state['current_question'], submitted=True)
         summary = get_training_session_summary(state['id'], student_id=student_id)
         st.subheader('本轮训练结束')
         with st.expander('查看本次训练结果', expanded=True):
@@ -150,6 +162,8 @@ try:
             st.write('主要错误类型：' + ('、'.join(ERROR_LABELS[k] for k in summary['main_error_types']) or '尚未选择错因'))
             st.info(summary['stop_reason'])
             for note in dict.fromkeys(summary['decision_notes']):
+                st.caption(note)
+            for note in summary.get('difficulty_coverage_limitation', []) + summary.get('type_coverage_limitation', []):
                 st.caption(note)
         target = summary['recommendation']['target_knowledge']
         st.subheader('下一步建议：' + target['knowledge_point_name'])

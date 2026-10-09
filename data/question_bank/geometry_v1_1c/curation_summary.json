@@ -1,0 +1,44 @@
+{
+  "original_candidates": 261,
+  "real_questions": 222,
+  "decisions": {
+    "needs_manual_fix": 99,
+    "approved": 123,
+    "rejected_non_question": 39
+  },
+  "question_types": {
+    "single_choice": 60,
+    "multiple_choice": 23,
+    "fill_blank": 26,
+    "subjective": 14
+  },
+  "knowledge_points": {
+    "G001": 14,
+    "G002": 14,
+    "G003": 19,
+    "G004": 21,
+    "G005": 18,
+    "G006": 8,
+    "G007": 8,
+    "G008": 1,
+    "G009": 12,
+    "G010": 8
+  },
+  "difficulty": {
+    "2": 109,
+    "3": 14
+  },
+  "diagram_required": {
+    "True": 45,
+    "False": 78
+  },
+  "question_diagram_questions": 45,
+  "solution_only_questions": 35,
+  "answer_leak_candidates": 7,
+  "unresolved_answer_leaks": 0,
+  "formula_problem_real_questions": 82,
+  "unlinked_disposition": {
+    "decorative": 20,
+    "unknown": 18
+  }
+}

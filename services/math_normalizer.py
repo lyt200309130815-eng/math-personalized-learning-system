@@ -60,7 +60,7 @@ def validate_math_expression(expr):
     if expr.count(r'\begin{') != expr.count(r'\end{'): issues.append('unclosed_environment')
     # Commands outside this deliberately small educational vocabulary require
     # review rather than sending unsupported macros to KaTeX.
-    allowed=set('frac sqrt log ln lg sin cos tan pi infty times div cdot leq geq ne neq in notin cup cap emptyset varnothing setminus mathbb mathrm text left right begin end cases aligned quad qquad pm mp alpha beta gamma delta theta lambda mu rho sigma omega Delta Sigma cdots ldots overline underline abs lvert rvert lbrace rbrace'.split())
+    allowed=set('frac sqrt log ln lg sin cos tan pi infty times div cdot leq geq ne neq in notin cup cap emptyset varnothing setminus mathbb mathrm text left right begin end cases aligned quad qquad pm mp alpha beta gamma delta theta lambda mu rho sigma omega Delta Sigma cdots ldots overline underline abs lvert rvert lbrace rbrace vec overrightarrow widehat overset frown matrix'.split())
     for command in re.findall(r'\\([A-Za-z]+)',expr):
         if command not in allowed: issues.append('unsupported_command:'+command)
     return {'valid':not issues,'issues':list(dict.fromkeys(issues))}
@@ -142,7 +142,7 @@ def _rewrite_notation(expr,depth=0):
     return value
 
 
-SPAN=re.compile(r'[A-Za-z0-9\\^_{}()[\].,，+*/=<>!|;:\-−×÷≤≥≠∈∪∞π√αβγΔ△±·\s]+')
+SPAN=re.compile(r"[A-Za-z0-9\\^_{}()[\].,'，+*/=<>!|;:\-−×÷≤≥≠∈∪∞π√Α-Ωα-ω△±·\s]+")
 
 
 def normalize_math_text(text):

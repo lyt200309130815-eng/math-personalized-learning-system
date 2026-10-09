@@ -1,0 +1,488 @@
+{
+  "result": "PASS",
+  "database": "E:\\Projects\\math_ai\\tmp\\geometry_v1_1e_validation_20261009T103413022431Z\\validation.db",
+  "audit": {
+    "database_counts": {
+      "questions": 369,
+      "attempts": 95
+    },
+    "geometry_trainable": 236,
+    "points": {
+      "G001": {
+        "name": "基本立体图形与表面积体积",
+        "count": 36,
+        "types": {
+          "single_choice": 21,
+          "fill_blank": 8,
+          "subjective": 2,
+          "multiple_choice": 5
+        },
+        "difficulty": {
+          "2": 22,
+          "3": 11,
+          "1": 2,
+          "4": 1
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G002": {
+        "name": "球的切接问题",
+        "count": 22,
+        "types": {
+          "single_choice": 14,
+          "fill_blank": 6,
+          "multiple_choice": 2
+        },
+        "difficulty": {
+          "2": 17,
+          "3": 5
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 2,
+        "missing_d2_d3_d4": [
+          4
+        ]
+      },
+      "G003": {
+        "name": "空间点线面位置关系",
+        "count": 27,
+        "types": {
+          "fill_blank": 5,
+          "multiple_choice": 4,
+          "single_choice": 14,
+          "subjective": 4
+        },
+        "difficulty": {
+          "2": 18,
+          "3": 9
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": [
+          4
+        ]
+      },
+      "G004": {
+        "name": "空间直线、平面的平行",
+        "count": 27,
+        "types": {
+          "multiple_choice": 3,
+          "subjective": 10,
+          "single_choice": 10,
+          "fill_blank": 4
+        },
+        "difficulty": {
+          "2": 15,
+          "4": 3,
+          "3": 9
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G005": {
+        "name": "空间直线、平面的垂直",
+        "count": 27,
+        "types": {
+          "single_choice": 8,
+          "fill_blank": 6,
+          "subjective": 6,
+          "multiple_choice": 7
+        },
+        "difficulty": {
+          "2": 16,
+          "3": 10,
+          "4": 1
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G006": {
+        "name": "空间向量概念与运算",
+        "count": 27,
+        "types": {
+          "fill_blank": 7,
+          "subjective": 4,
+          "single_choice": 12,
+          "multiple_choice": 4
+        },
+        "difficulty": {
+          "2": 14,
+          "4": 4,
+          "3": 8,
+          "1": 1
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G007": {
+        "name": "向量法求空间角",
+        "count": 30,
+        "types": {
+          "single_choice": 9,
+          "subjective": 12,
+          "fill_blank": 7,
+          "multiple_choice": 2
+        },
+        "difficulty": {
+          "2": 8,
+          "3": 9,
+          "4": 10,
+          "5": 3
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G008": {
+        "name": "空间距离",
+        "count": 8,
+        "types": {
+          "single_choice": 3,
+          "subjective": 2,
+          "multiple_choice": 1,
+          "fill_blank": 2
+        },
+        "difficulty": {
+          "3": 5,
+          "4": 2,
+          "2": 1
+        },
+        "gap_to_10": 2,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G009": {
+        "name": "截面与交线问题",
+        "count": 17,
+        "types": {
+          "multiple_choice": 5,
+          "subjective": 3,
+          "single_choice": 6,
+          "fill_blank": 3
+        },
+        "difficulty": {
+          "2": 12,
+          "3": 2,
+          "4": 2,
+          "1": 1
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 0,
+        "missing_d2_d3_d4": []
+      },
+      "G010": {
+        "name": "动态与轨迹问题",
+        "count": 15,
+        "types": {
+          "single_choice": 7,
+          "multiple_choice": 4,
+          "fill_blank": 3,
+          "subjective": 1
+        },
+        "difficulty": {
+          "2": 8,
+          "3": 6,
+          "5": 1
+        },
+        "gap_to_10": 0,
+        "choice_gap": 0,
+        "fill_gap": 0,
+        "subjective_gap": 1,
+        "missing_d2_d3_d4": [
+          4
+        ]
+      }
+    },
+    "types": {
+      "fill_blank": 51,
+      "multiple_choice": 37,
+      "subjective": 44,
+      "single_choice": 104
+    },
+    "difficulty": {
+      "2": 131,
+      "3": 74,
+      "4": 23,
+      "5": 4,
+      "1": 4
+    },
+    "foreign_key_violations": []
+  },
+  "diagnostic": {
+    "student": "TEST_GEO_V11E",
+    "question_ids": [
+      "GQ-aeab0d608dce8a27152f",
+      "GQ-148ebe88f26537ba5829",
+      "GQ-1db6c10b3f448db73138",
+      "GQ-11fc0a419a885602540f",
+      "GQ-02d8239d414229002960",
+      "GQ-746dbc126dec6096e365",
+      "GQ-91a88f8dfb1d7a8be94d",
+      "GQ-ddfae3124c26a1e4e165",
+      "GQ-a3da059167dc643a126b",
+      "GQ-31d1653825585036a8aa",
+      "GQ-bf51ca20127ed8c85b25",
+      "GQ-002b3baad92884d4f8e5",
+      "GQ-04596702baf31dee43a0",
+      "GQ-02c40d2a9ed597ab3b4b",
+      "GQ-12278a7ed57a2af16f77"
+    ],
+    "knowledge": {
+      "G001": 2,
+      "G002": 1,
+      "G003": 2,
+      "G004": 1,
+      "G005": 2,
+      "G006": 2,
+      "G007": 1,
+      "G008": 1,
+      "G009": 2,
+      "G010": 1
+    },
+    "difficulty": {
+      "1": 4,
+      "2": 9,
+      "3": 2
+    },
+    "question_types": {
+      "single_choice": 5,
+      "fill_blank": 6,
+      "multiple_choice": 2,
+      "subjective": 2
+    }
+  },
+  "adaptive": {
+    "low": {
+      "initial_score": 0.0,
+      "independent_evidence": 6,
+      "initial_band": [
+        1,
+        2
+      ],
+      "selected": [
+        {
+          "id": "GQ-d072168a6a2b4618193b",
+          "knowledge": "G007",
+          "difficulty": 2,
+          "type": "multiple_choice"
+        },
+        {
+          "id": "GQ-a3c56f8e34d9499c8d4e",
+          "knowledge": "G007",
+          "difficulty": 2,
+          "type": "fill_blank"
+        }
+      ],
+      "actual_difficulties": [
+        2,
+        2
+      ],
+      "type_counts": {
+        "multiple_choice": 1,
+        "fill_blank": 1
+      },
+      "status": "coverage_limited",
+      "limitations": [
+        "题库覆盖不足（coverage limitation）：当前目标缺少D1，不能验证相应难度的进阶表现。"
+      ]
+    },
+    "medium": {
+      "initial_score": 0.5992425179632361,
+      "independent_evidence": 6,
+      "initial_band": [
+        2,
+        3
+      ],
+      "selected": [
+        {
+          "id": "GQ-a3c56f8e34d9499c8d4e",
+          "knowledge": "G007",
+          "difficulty": 2,
+          "type": "fill_blank"
+        },
+        {
+          "id": "GQ-4fb6af5b58bb045b1748",
+          "knowledge": "G007",
+          "difficulty": 3,
+          "type": "subjective"
+        },
+        {
+          "id": "GQ-155681ce367440fbbbfd",
+          "knowledge": "G007",
+          "difficulty": 3,
+          "type": "single_choice"
+        },
+        {
+          "id": "GQ-d072168a6a2b4618193b",
+          "knowledge": "G007",
+          "difficulty": 2,
+          "type": "multiple_choice"
+        }
+      ],
+      "actual_difficulties": [
+        2,
+        3,
+        3,
+        2
+      ],
+      "type_counts": {
+        "fill_blank": 1,
+        "subjective": 1,
+        "single_choice": 1,
+        "multiple_choice": 1
+      },
+      "status": "needs_support",
+      "limitations": [
+        "题库覆盖不足（coverage limitation）：当前目标缺少D1，不能验证相应难度的进阶表现。"
+      ]
+    },
+    "high": {
+      "initial_score": 0.8916666666666667,
+      "independent_evidence": 6,
+      "initial_band": [
+        3,
+        4
+      ],
+      "selected": [
+        {
+          "id": "GQ-4fb6af5b58bb045b1748",
+          "knowledge": "G007",
+          "difficulty": 3,
+          "type": "subjective"
+        },
+        {
+          "id": "GQ-31a0b5b4e45a5aecee2c",
+          "knowledge": "G007",
+          "difficulty": 3,
+          "type": "fill_blank"
+        },
+        {
+          "id": "GQ-94718acd9705ca42a24c",
+          "knowledge": "G007",
+          "difficulty": 5,
+          "type": "single_choice"
+        },
+        {
+          "id": "GQ-b77331da505f430251e7",
+          "knowledge": "G007",
+          "difficulty": 5,
+          "type": "subjective"
+        },
+        {
+          "id": "GQ-e40e37a44adefbaa9e88",
+          "knowledge": "G007",
+          "difficulty": 4,
+          "type": "fill_blank"
+        }
+      ],
+      "actual_difficulties": [
+        3,
+        3,
+        5,
+        5,
+        4
+      ],
+      "type_counts": {
+        "subjective": 2,
+        "fill_blank": 2,
+        "single_choice": 1
+      },
+      "status": "completed",
+      "limitations": []
+    },
+    "stable": {
+      "initial_score": 1.0,
+      "independent_evidence": 6,
+      "initial_band": [
+        4,
+        5
+      ],
+      "selected": [
+        {
+          "id": "GQ-1e1dd34177287bb91ad8",
+          "knowledge": "G007",
+          "difficulty": 4,
+          "type": "subjective"
+        },
+        {
+          "id": "GQ-e40e37a44adefbaa9e88",
+          "knowledge": "G007",
+          "difficulty": 4,
+          "type": "fill_blank"
+        },
+        {
+          "id": "GQ-94718acd9705ca42a24c",
+          "knowledge": "G007",
+          "difficulty": 5,
+          "type": "single_choice"
+        },
+        {
+          "id": "GQ-b77331da505f430251e7",
+          "knowledge": "G007",
+          "difficulty": 5,
+          "type": "subjective"
+        },
+        {
+          "id": "GQ-e8c0fda7221b1d2f6f0b",
+          "knowledge": "G007",
+          "difficulty": 4,
+          "type": "fill_blank"
+        }
+      ],
+      "actual_difficulties": [
+        4,
+        4,
+        5,
+        5,
+        4
+      ],
+      "type_counts": {
+        "subjective": 2,
+        "fill_blank": 2,
+        "single_choice": 1
+      },
+      "status": "completed",
+      "limitations": []
+    }
+  },
+  "assets": {
+    "question_diagram": 111,
+    "solution_diagram": 197,
+    "option_image": 5
+  },
+  "recovery_images": {
+    "question_diagram": 68,
+    "solution_diagram": 112
+  },
+  "function_regression": {
+    "pool": 128,
+    "diagnostic_size": 18,
+    "training_id": "FC-10fd3ba793bf472e",
+    "recommendation_target": "K001",
+    "profile": "PASS"
+  },
+  "production_attempts_unchanged": true
+}

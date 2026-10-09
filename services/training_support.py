@@ -35,6 +35,8 @@ def request_hint(student_id, session_id, level, *, database_path=None):
         q = state['current_question']
         if not q or state['status'] not in ('active','needs_support','completed'):
             raise ValueError('当前没有可提示题目。')
+        if state['taxonomy_version'] == 'geometry_v1' and level == 4 and not state['submitted']:
+            raise ValueError('请先作答，再查看完整解析。')
         content = get_hint(q,level)
         conn.execute('INSERT INTO training_hint_events(session_id,question_id,hint_level) VALUES (?,?,?)',(session_id,q['id'],level))
         state['hint_count'] = state.get('hint_count',0)+1

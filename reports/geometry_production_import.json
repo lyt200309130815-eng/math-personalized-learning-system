@@ -1,0 +1,20 @@
+{
+  "database": "E:\\Projects\\math_ai\\math_ai.db",
+  "backup": "E:\\Projects\\math_ai\\backups\\math_ai_before_geometry_v1_1c_20261008T150615492884Z.sqlite3",
+  "inserted": 123,
+  "skipped": 0,
+  "before": {
+    "questions_count": 133,
+    "attempts_count": 79,
+    "attempts_digest": "1241454b8ece507d949a1f38d2e05025207027dd1676ba42cee3f6507cb7f7ed"
+  },
+  "after": {
+    "questions_count": 256,
+    "attempts_count": 79,
+    "attempts_digest": "1241454b8ece507d949a1f38d2e05025207027dd1676ba42cee3f6507cb7f7ed"
+  },
+  "sha256_before": "3c351d7576c5d9b345de1e250129497420cdf83f520d8c83c267dade9be86ab8",
+  "sha256_after": "8ca580e1ad8104f8ae327178547e6ce8c514fd14165d772bb928de1e571aa0c6",
+  "attempts_unchanged": true,
+  "old_questions_unchanged": true
+}

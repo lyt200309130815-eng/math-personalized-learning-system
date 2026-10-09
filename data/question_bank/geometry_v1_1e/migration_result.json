@@ -1,0 +1,797 @@
+{
+  "database": "E:\\Projects\\math_ai\\math_ai.db",
+  "backup": "E:\\Projects\\math_ai\\backups\\math_ai_pre_geometry_v1_1e_20261009T101133500979Z.db",
+  "inserted": 113,
+  "skipped": 0,
+  "before": {
+    "questions_count": 256,
+    "attempts_count": 95,
+    "attempts_digest": "6c0277fa573841863b2c8db37724302a057a35cb4e0c2b50e7be71077bf6b1bc"
+  },
+  "after": {
+    "questions_count": 369,
+    "attempts_count": 95,
+    "attempts_digest": "6c0277fa573841863b2c8db37724302a057a35cb4e0c2b50e7be71077bf6b1bc"
+  },
+  "sha256_before": "c68f1dac8bc6e47a0d002dde29bc00ea60adefb3794f36e53fe88b4d300c524e",
+  "sha256_after": "287393040d1277638c7ccd39a4a64363b2ab58a0e6ed778ef4f1f9d2cf2f5f57",
+  "attempts_unchanged": true,
+  "old_questions_unchanged": true,
+  "backup_sha256": "149ce796c6c2ffe1db4c58ac21581368b0251ca4ba99cec6555124cd85ab237c",
+  "backup_integrity_check": "ok",
+  "baseline_before": {
+    "database": "E:\\Projects\\math_ai\\math_ai.db",
+    "db_sha256": "c68f1dac8bc6e47a0d002dde29bc00ea60adefb3794f36e53fe88b4d300c524e",
+    "questions_count": 256,
+    "geometry_question_count": 123,
+    "attempts_count": 95,
+    "attempts_digest": "6c0277fa573841863b2c8db37724302a057a35cb4e0c2b50e7be71077bf6b1bc"
+  },
+  "baseline_after": {
+    "database": "E:\\Projects\\math_ai\\math_ai.db",
+    "db_sha256": "287393040d1277638c7ccd39a4a64363b2ab58a0e6ed778ef4f1f9d2cf2f5f57",
+    "questions_count": 369,
+    "geometry_question_count": 236,
+    "attempts_count": 95,
+    "attempts_digest": "6c0277fa573841863b2c8db37724302a057a35cb4e0c2b50e7be71077bf6b1bc"
+  },
+  "manual_reviewed": 113,
+  "gate_passed": 113,
+  "blocked": [],
+  "duplicate_count": 0,
+  "duplicate_audit": [
+    {
+      "id": "GQ-421f4a375907cb3e148d",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-5a12eb7246e2bd5b5a7e",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-438ccac471ececc69a7d",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-4406ce965f2a1f9b092e",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-cf1e8716fad07e587721",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-96acca52ae6c6ec980b8",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-32fac31cca1cca1b91f0",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d2010389f51e5ef1606d",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-bf51ca20127ed8c85b25",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-62bf223ab408eab73c25",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-afd3d4785b9ef2300f25",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-e029f53ce6ec06300486",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b1c16a0333c27ab8139f",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d6e720ee143749eab684",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-1719f752c80bdeee5e15",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-57b1e1d6bdf176e70e3a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-6a857afa2c16dbb79579",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-0a9664afe530634a529a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-aebf253e07b2eb859da6",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-c2ceb9770c5f35afd939",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-479c7544a4226c7b7c30",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-3217603fcd646dcf1c22",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b9976496b7719d3f6e78",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-3f4d8647c35641073cf6",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-557b006721fea758a106",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-65e5556ff8e8a0f8cdac",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-ee644549ed80722dc822",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-c1bf3dd04b07413fa3e7",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-acb08018e438b649e456",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-6177a49d2ae9ebb3894d",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-8397b7d5afae47249e07",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-0ed58a2a28b6a42da010",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b8b23f37a6385c0c1c4a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-2ba9158bf754345f1355",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-a225f8ea3e6265a40d87",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-e2c3542a42270b96bae7",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-7f1c808eddce9dcd80c9",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-39d465a49b48bd52493f",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d39aa1670ba20f9212b4",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-4e99357741ca42631437",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-df3fb25702a696e200f5",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-5b255e7b9e9edb45637e",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d2bc7bc962da62203bd4",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-f3983ee730b5f7ca318f",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-2099bbd0038acb7a0243",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-f2e772cb5b48729f5c51",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b476e7569ba7f35aa34f",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-755759281e508c31b0ee",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-094f702eaedcaa200984",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-f802f6184ffed74dfefc",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-4d563f4b02d14e859c88",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-746dbc126dec6096e365",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-acb4241e094aa5b3788a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-913a4af32c8c2e0ecca8",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-833c13132453a7667b09",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-8ca9aa5b61a9683708f1",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-2a21046b85c910e86866",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-28976b4cd7e41a34b0b5",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-ea00c61f854b32498199",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-fd3c936446a75cade6ba",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-44103f0f93f305fb031c",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-260f08159488a6343309",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d67c70c6d4b1400c51d6",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-1b84e97559e4fd2c4f55",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-8c35234af1b620b8b41a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-d3608502a9fe678a6cd6",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-05d7b75071ca37a7e8ad",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-3d8295a372c407c9adbf",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-a4c6f36ca735f4e49ce1",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-9b7564660aaf8f3610c5",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-31a0b5b4e45a5aecee2c",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-29732137f11ac0e24e20",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-e40e37a44adefbaa9e88",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-eeb8bd2288c271fe4530",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-4fb6af5b58bb045b1748",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-43517c44d3b426ad3210",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-74893f4c4deabd69e05c",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-155681ce367440fbbbfd",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-f1e8e276583784d762da",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-6cd98a187b2585b1db5e",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-3473d17779f4883b00c9",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-65fb9c9eaf414d654596",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-58b9169fcd064c384e5b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-fb40fb9835a76a03aad1",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-94718acd9705ca42a24c",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-e8c0fda7221b1d2f6f0b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-1e191173c03fbb24f928",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-8cc65a918aa1f92bdfdf",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-aa485b4982a07a928a10",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-ac726f6bd73cfabed2a9",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-c586ebf6b65c03ee6b81",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b5250596fb3600945b9b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-c0aa17758902dd2dc58e",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b77331da505f430251e7",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-6c897c9c9842c2ae1c21",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-0b23241033a06e68ebb6",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-2a2bd96f02ae30890d51",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-657cc8e18bba31623f4b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-c902174ff40a5ee7485b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-db9aa8a4e7bacbfa5880",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-3c60e0d09669eb4cff97",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-1e1dd34177287bb91ad8",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-6ab237190ac43d19bb4d",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-b8ae9df688ee1ad80881",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-5d64c26576583f269cdd",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-aeab0d608dce8a27152f",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-a12f68f2e58a5848bc89",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-ccae5b743ade45e9bae1",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-147b8b99fc135926806a",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-a3da059167dc643a126b",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-dba53a0851d4024ee193",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-e5f1458410f3bb1297a0",
+      "duplicates": {},
+      "already_integrated": false
+    },
+    {
+      "id": "GQ-98ac3f3b728055494c69",
+      "duplicates": {},
+      "already_integrated": false
+    }
+  ],
+  "unrecoverable_status": "needs_manual_fix",
+  "word_verification": {
+    "file": "geometry_recovery_batch_001_可读版.docx",
+    "embedded_images": 180,
+    "image_labels": [
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "question_diagram",
+      "question_diagram",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "question_diagram",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "solution_diagram（仅解析区）",
+      "question_diagram",
+      "solution_diagram（仅解析区）"
+    ],
+    "native_math_count": 1840
+  }
+}

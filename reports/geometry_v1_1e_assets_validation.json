@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "recovered_questions": 113,
+  "question_images": 68,
+  "solution_images": 112,
+  "total_images": 180,
+  "rendered_math": 3099,
+  "katex_errors": [],
+  "solution_images_before": 0,
+  "database_writes": false,
+  "folder": "E:\\Projects\\math_ai\\tmp\\geometry_v1_1e_assets_20261009T102042587820Z"
+}

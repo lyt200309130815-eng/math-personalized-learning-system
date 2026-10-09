@@ -80,3 +80,6 @@ data/raw_sources/
 data/questions.csv
 data/source_mapping.json
 AGENTS.md
+
+.streamlit/secrets.toml
+!data/deployment/question_bank.db

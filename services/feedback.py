@@ -52,8 +52,9 @@ def build_feedback_context(student_id: str, *, database_path: str | Path | None 
               "recent_accuracy", "stability", "difficulty_performance")
     target_fields = ("knowledge_point_id", "knowledge_point_name", "mastery_score", "mastery_level",
                      "attempt_count", "evidence_level", "recommendation_type", "reason", "difficulty_range")
+    from settings import get_topic_name
     return {
-        "student_id": student_id, "topic": "函数",
+        "student_id": student_id, "topic": get_topic_name(taxonomy_version),
         "pending_work": {"subjective":sum(v.get('subjective',0) for v in pending.values()),
                          "fill_blank":sum(v.get('fill_blank',0) for v in pending.values())},
         "knowledge_points": [{field: point[field] for field in fields} for point in mastery],
@@ -83,7 +84,7 @@ def build_rule_based_feedback(context: dict) -> str:
     if not count:
         performance = "当前暂无训练数据，尚不能判断知识掌握情况。未评估不代表能力差，先通过基础练习了解当前情况。"
     else:
-        performance = f"函数专题已累计训练{count}次。下面仅解释已有学情结果，掌握度与证据量需要结合查看，不能据此给出正式成绩。"
+        performance = f"{context['topic']}专题已累计训练{count}次。下面仅解释已有学情结果，掌握度与证据量需要结合查看，不能据此给出正式成绩。"
     advantage = "、".join(strengths) + "当前表现较好。" if strengths else "目前仍需通过训练积累表现证据，暂不作优势判断。"
     pending = context.get('pending_work',{})
     if any(pending.values()):

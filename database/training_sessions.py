@@ -68,12 +68,13 @@ def save_session(conn, state):
         (json.dumps(state, ensure_ascii=False), state['status'], state['final_mastery'], state['status'], state['id']))
 
 
-def get_latest_session(student_id, database_path=None):
+def get_latest_session(student_id, database_path=None, *, taxonomy_version=None):
+    from settings import get_active_taxonomy_version
     with closing(get_connection(database_path, read_only=True)) as conn:
         if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='training_sessions'").fetchone():
             return None
         row = conn.execute('''SELECT state_json FROM training_sessions WHERE student_id=?
-            AND taxonomy_version='function_v2' ORDER BY rowid DESC LIMIT 1''', (student_id,)).fetchone()
+            AND taxonomy_version=? ORDER BY rowid DESC LIMIT 1''', (student_id, taxonomy_version or get_active_taxonomy_version())).fetchone()
     return json.loads(row[0]) if row else None
 
 

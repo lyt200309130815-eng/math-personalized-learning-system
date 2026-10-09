@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from statistics import pstdev
+from settings import get_active_taxonomy_version
 
 from database.database import (
     DATABASE_PATH, get_function_knowledge_points, get_knowledge_attempts, get_knowledge_point,
@@ -59,6 +60,15 @@ def calculate_knowledge_mastery(
         "difficulty_performance": None, "mastery_score": None,
         "mastery_level": "未评估", "evidence_level": get_evidence_level(count),
     }
+    if (taxonomy_version or get_active_taxonomy_version()) == 'geometry_v1':
+        from database.database import get_approved_questions
+        from services.geometry_quality import source_fingerprint
+        pool = get_approved_questions(knowledge_point_id, database_path=database_path, taxonomy_version='geometry_v1')
+        identities = {q['id']: source_fingerprint(q) for q in pool}
+        evidence_count = len({identities.get(a['question_id']) or a['question_id'] for a in attempts})
+        result.update(source_evidence_count=evidence_count, coverage_available=len(pool),
+                      evidence_status='insufficient' if evidence_count < 3 else 'sufficient',
+                      mastery_display='证据不足 / 待进一步训练' if evidence_count < 3 else None)
     if not attempts:
         return result
     overall_accuracy = correct_count / count
@@ -74,6 +84,8 @@ def calculate_knowledge_mastery(
     result.update(overall_accuracy=overall_accuracy, recent_accuracy=recent_accuracy,
                   stability=stability, difficulty_performance=difficulty_performance,
                   mastery_score=score, mastery_level=get_mastery_level(score))
+    if result.get('evidence_status') == 'sufficient':
+        result['mastery_display'] = f'{score:.0%}'
     return result
 
 

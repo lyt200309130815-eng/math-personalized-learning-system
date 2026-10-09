@@ -1,18 +1,41 @@
 """One question/input abstraction for the training page's three question types."""
 from services.math_text import math_markdown, render_math_text
+from services.question_assets import diagrams_available, visible_assets, readable_asset, asset_path
 
 SUBJECTIVE_NOTICE = '主观题自动识别与评分功能将在后续版本完善。'
 TYPE_NAMES = {'single_choice':'单选','multiple_choice':'多选','fill_blank':'填空','subjective':'大题'}
 
 
 def render_question(st, question):
+    if not diagrams_available(question):
+        return False
     render_math_text(question['stem'])
+    for asset in visible_assets(question):
+        if readable_asset(asset):
+            st.image(str(asset_path(asset)), caption='选项图' if asset['role'] == 'option_image' else '题图')
     if question.get('question_type')=='subjective':
         for sub in question.get('sub_questions',[]):
             # Preserve common conditions in the stem; no solution is displayed.
-            st.caption(f"第{sub['id']}问 · {sub['max_score']:g}分")
+            st.caption(f"第{sub['id']}问" + (f" · {sub['max_score']:g}分" if sub.get('max_score') else ''))
             render_math_text(sub['stem'])
-        st.write(f"总分：{question.get('max_score',0):g}分（本阶段不自动评分）")
+        st.write((f"总分：{question['max_score']:g}分" if question.get('max_score') else '参考解答题，未设定分值') + '（本阶段不自动评分）')
+    return True
+
+
+def render_solution(st, question, *, submitted=False):
+    if not submitted:
+        return
+    st.subheader('答案解析')
+    kind = question.get('question_type', 'single_choice')
+    answer = (question.get('answer') if kind == 'single_choice' else ', '.join(question.get('correct_answers', [])) if kind == 'multiple_choice'
+              else question.get('canonical_answer') if kind == 'fill_blank' else question.get('reference_answer'))
+    if answer:
+        render_math_text('参考答案：' + answer)
+    if question.get('explanation'):
+        render_math_text(question['explanation'])
+    for asset in visible_assets(question, solution=True):
+        if readable_asset(asset):
+            st.image(str(asset_path(asset)), caption='解析图')
 
 
 def render_feedback(st, answer):

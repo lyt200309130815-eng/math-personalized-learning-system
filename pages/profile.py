@@ -6,7 +6,7 @@ import streamlit as st
 
 from services.mastery import calculate_student_mastery
 from services.profile import build_profile_data
-from settings import get_active_taxonomy_version
+from settings import get_active_taxonomy_version, get_topic_name
 
 
 st.title("高中数学智能训练系统")
@@ -15,7 +15,7 @@ if get_active_taxonomy_version()=='function_v2':
     st.subheader('函数学习画像')
 student_id = st.session_state.get("student_id", "S001")
 st.write(f"当前学生：{student_id}")
-st.write("当前专题：函数")
+st.write("当前专题：" + get_topic_name())
 st.caption("知识画像根据历史训练数据动态计算，仅作为学习诊断参考。")
 
 try:

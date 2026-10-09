@@ -32,8 +32,8 @@ def get_training_questions(database_path: str | Path | None = None, *, taxonomy_
     database_path = get_database_path() if database_path is None else Path(database_path)
     if not Path(database_path).is_file():
         raise FileNotFoundError("数据库不存在，请先运行 python init_db.py。")
-    if _version(taxonomy_version) == 'function_v2':
-        return get_approved_questions(database_path=database_path, taxonomy_version='function_v2')
+    if _version(taxonomy_version) != 'function_v1':
+        return get_approved_questions(database_path=database_path, taxonomy_version=_version(taxonomy_version))
     with closing(get_connection(database_path, read_only=True)) as connection:
         rows = connection.execute(
             """SELECT q.*, k.name AS knowledge_point_name
@@ -74,9 +74,9 @@ def record_attempt(
         raise ValueError('Hint and retry counts must be nonnegative integers')
     with closing(get_connection(database_path)) as connection:
         with connection:
-            if _version(taxonomy_version)=='function_v2' and not connection.execute(
+            if _version(taxonomy_version)!='function_v1' and not connection.execute(
                 "SELECT 1 FROM question_knowledge_mappings WHERE taxonomy_version=? AND question_id=? AND role=? AND review_status=?",
-                ('function_v2',question_id,'primary','approved')).fetchone():
+                (_version(taxonomy_version),question_id,'primary','approved')).fetchone():
                 raise ValueError('未批准题不能提交。')
             cursor = connection.execute(
                 """INSERT INTO attempts
@@ -97,10 +97,10 @@ def get_recent_attempts(
     if not isinstance(limit, int) or isinstance(limit, bool) or limit < 0:
         raise ValueError("limit must be a nonnegative integer")
     with closing(get_connection(database_path, read_only=True)) as connection:
-        if _version(taxonomy_version)=='function_v2':
+        if _version(taxonomy_version)!='function_v1':
             return connection.execute('''SELECT a.* FROM attempts a JOIN question_knowledge_mappings m ON m.question_id=a.question_id
                 WHERE a.student_id=? AND m.taxonomy_version=? AND m.role=? AND m.review_status=?
-                ORDER BY a.created_at DESC,a.id DESC LIMIT ?''',(student_id,'function_v2','primary','approved',limit)).fetchall()
+                ORDER BY a.created_at DESC,a.id DESC LIMIT ?''',(student_id,_version(taxonomy_version),'primary','approved',limit)).fetchall()
         return connection.execute(
             """SELECT * FROM attempts WHERE student_id = ?
                ORDER BY created_at DESC, id DESC LIMIT ?""",
@@ -122,8 +122,8 @@ def get_knowledge_point(
     knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> sqlite3.Row | None:
     """Read knowledge metadata without creating or modifying a database."""
-    if _version(taxonomy_version) == 'function_v2':
-        return next((p for p in get_knowledge_points('function_v2', database_path=database_path) if p['id']==knowledge_point_id),None)
+    if _version(taxonomy_version) != 'function_v1':
+        return next((p for p in get_knowledge_points(_version(taxonomy_version), database_path=database_path) if p['id']==knowledge_point_id),None)
     with closing(get_connection(database_path, read_only=True)) as connection:
         return connection.execute(
             "SELECT * FROM knowledge_points WHERE id = ?", (knowledge_point_id,),
@@ -134,8 +134,8 @@ def get_function_knowledge_points(
     *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> list[sqlite3.Row]:
     """Return every point in the requested version, including untrained ones."""
-    if _version(taxonomy_version) == 'function_v2':
-        return get_knowledge_points('function_v2', database_path=database_path)
+    if _version(taxonomy_version) != 'function_v1':
+        return get_knowledge_points(_version(taxonomy_version), database_path=database_path)
     with closing(get_connection(database_path, read_only=True)) as connection:
         return connection.execute(
             """SELECT * FROM knowledge_points
@@ -149,7 +149,7 @@ def get_knowledge_attempts(
     connection: sqlite3.Connection | None = None,
 ) -> list[sqlite3.Row]:
     """Read all matching attempts with difficulty, newest first and deterministic ties."""
-    if _version(taxonomy_version) == 'function_v2':
+    if _version(taxonomy_version) != 'function_v1':
         with (closing(get_connection(database_path, read_only=True)) if connection is None else nullcontext(connection)) as connection:
             gate = _scored_subjective_gate(connection)
             return connection.execute(f'''SELECT a.id,a.is_correct,q.difficulty,a.created_at,a.question_id
@@ -157,7 +157,7 @@ def get_knowledge_attempts(
                 JOIN question_knowledge_mappings m ON m.question_id=q.id
                 WHERE a.student_id=? AND m.taxonomy_version=? AND m.knowledge_point_id=?
                 AND m.role=? AND m.review_status=? AND a.is_correct IS NOT NULL {gate} ORDER BY a.created_at DESC,a.id DESC''',
-                (student_id,'function_v2',knowledge_point_id,'primary','approved')).fetchall()
+                (student_id,_version(taxonomy_version),knowledge_point_id,'primary','approved')).fetchall()
     with (closing(get_connection(database_path, read_only=True)) if connection is None else nullcontext(connection)) as connection:
         gate = _scored_subjective_gate(connection)
         return connection.execute(
@@ -179,9 +179,9 @@ def get_questions_for_knowledge(
     knowledge_point_id: str, *, database_path: str | Path | None = None, taxonomy_version: str | None = None,
 ) -> list[dict]:
     """Read practice previews without exposing correct answers or solutions."""
-    if _version(taxonomy_version) == 'function_v2':
+    if _version(taxonomy_version) != 'function_v1':
         fields=('id','stem','difficulty','knowledge_point_id','knowledge_point_name','question_type')
-        return [{key:q[key] for key in fields} for q in get_approved_questions(knowledge_point_id, database_path=database_path,taxonomy_version='function_v2')]
+        return [{key:q[key] for key in fields} for q in get_approved_questions(knowledge_point_id, database_path=database_path,taxonomy_version=_version(taxonomy_version))]
     with closing(get_connection(database_path, read_only=True)) as connection:
         rows = connection.execute(
             """SELECT q.id, q.stem, q.difficulty, q.knowledge_point_id,
@@ -195,7 +195,7 @@ def get_questions_for_knowledge(
 
 def _version(version=None):
     version=version or get_active_taxonomy_version()
-    if version not in ('function_v1','function_v2'): raise ValueError('知识体系版本无效。')
+    if version not in ('function_v1','function_v2','geometry_v1'): raise ValueError('知识体系版本无效。')
     return version
 
 
@@ -204,7 +204,7 @@ def get_knowledge_points(taxonomy_version=None, *, database_path=None):
     if version=='function_v1':
         return get_function_knowledge_points(database_path=database_path,taxonomy_version=version)
     with closing(get_connection(database_path,read_only=True)) as c:
-        points=[dict(r) for r in c.execute('SELECT * FROM knowledge_catalog WHERE taxonomy_version=? AND topic=? ORDER BY display_order,id',(version,'函数'))]
+        points=[dict(r) for r in c.execute('SELECT * FROM knowledge_catalog WHERE taxonomy_version=? ORDER BY display_order,id',(version,))]
         for p in points:
             p['prerequisite_ids']=json.dumps([r[0] for r in c.execute('SELECT prerequisite_id FROM knowledge_prerequisites WHERE taxonomy_version=? AND knowledge_point_id=? ORDER BY prerequisite_id',(version,p['id']))])
         return points
@@ -263,6 +263,9 @@ def get_approved_questions(knowledge_point_id=None, *, database_path=None, taxon
             q['parameter_set'] = json.loads(extra['parameter_set'])
             q['hints'] = json.loads(extra['hints_json'])
         q.update(extensions.get(row['id'], {}))
+        if version == 'geometry_v1':
+            from services.geometry_quality import source_fingerprint
+            q['source_fingerprint'] = source_fingerprint(q)
         q['formula_status'] = formula_statuses.get(q['id'], 'unverified')
         if not include_untrainable:
             from services.math_normalizer import audit_question
@@ -271,5 +274,9 @@ def get_approved_questions(knowledge_point_id=None, *, database_path=None, taxon
                 continue
             q = audited['normalized']
             q['formula_status'] = 'valid'
+            if version == 'geometry_v1':
+                from services.question_assets import geometry_trainable
+                if not geometry_trainable(q):
+                    continue
         result.append(q)
     return result

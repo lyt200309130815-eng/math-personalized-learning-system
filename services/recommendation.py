@@ -26,6 +26,9 @@ def get_recommendation_type(mastery: dict) -> str:
 
 def get_difficulty_range(mastery: dict) -> tuple[int, int]:
     """Map actual mastery and strategy to a preferred difficulty band."""
+    if mastery.get('knowledge_point_id', '').startswith('G'):
+        from services.geometry_quality import geometry_difficulty_range
+        return geometry_difficulty_range(mastery)
     score = mastery["mastery_score"]
     if score is None or score < 0.40:
         return (1, 2)
@@ -100,7 +103,8 @@ def recommend_next_knowledge(
     score = target["mastery_score"]
     name = target["knowledge_point_name"]
     if all(result["attempt_count"] == 0 for result in results):
-        reason = "当前暂无训练数据，建议从函数基础知识开始进行诊断训练。"
+        from settings import get_topic_name
+        reason = "当前暂无训练数据，建议从" + get_topic_name(taxonomy_version) + "基础知识开始进行诊断训练。"
     elif score is None:
         reason = f"{name}尚未评估，建议先进行基础诊断训练。"
     elif strategy == "补弱":
@@ -114,6 +118,8 @@ def recommend_next_knowledge(
     if target["knowledge_point_id"] != origin["knowledge_point_id"]:
         status = "尚未评估" if score is None else "尚未达到60%"
         reason = f"训练{origin['knowledge_point_name']}前，需要先验证或补强前置知识；{name}{status}。" + reason
+    if target.get('evidence_status') == 'insufficient':
+        reason = f'{name}：证据不足 / 待进一步训练；先验证独立原题与必要前置知识。'
     return {**target, "recommendation_type": strategy, "reason": reason,
             "difficulty_range": list(get_difficulty_range(target))}
 
@@ -124,7 +130,7 @@ def _select_questions(student_id: str, target: dict, limit: int, database_path, 
     kwargs = {'database_path': database_path}
     if taxonomy_version is not None: kwargs['taxonomy_version'] = taxonomy_version
     questions = get_questions_for_knowledge(target["knowledge_point_id"], **kwargs)
-    if (taxonomy_version or get_active_taxonomy_version()) == 'function_v2':
+    if (taxonomy_version or get_active_taxonomy_version()) != 'function_v1':
         mastery = {p['knowledge_point_id']:p for p in calculate_student_mastery(student_id, **kwargs)}
         points = get_function_knowledge_points(**kwargs)
         graph = {p['id']:json.loads(p['prerequisite_ids']) for p in points}
@@ -133,10 +139,20 @@ def _select_questions(student_id: str, target: dict, limit: int, database_path, 
             score = mastery[key]['mastery_score']
             return score is not None and score>=0.60 and all(ready(p,trail+(key,)) for p in graph[key])
         if any(not ready(p) for p in graph[target['knowledge_point_id']]): return []
-        questions = [q for q in questions if all(ready(p) for p in get_question_prerequisites(q['id'], 'function_v2', database_path=database_path))]
+        questions = [q for q in questions if all(ready(p) for p in get_question_prerequisites(q['id'], taxonomy_version or get_active_taxonomy_version(), database_path=database_path))]
     recent_ids = (set(get_recent_question_ids(student_id,database_path=database_path))
-                  if (taxonomy_version or get_active_taxonomy_version()) == 'function_v2'
+                  if (taxonomy_version or get_active_taxonomy_version()) != 'function_v1'
                   else {row['question_id'] for row in get_recent_attempts(student_id,10,**kwargs)})
+    geometry = (taxonomy_version or get_active_taxonomy_version()) == 'geometry_v1'
+    if geometry:
+        from database.database import get_approved_questions
+        from services.geometry_quality import geometry_identity_tokens
+        full_pool = get_approved_questions(**kwargs)
+        identities = {q['id']: geometry_identity_tokens(q) for q in full_pool}
+        recent_sources = set().union(*(identities[key] for key in recent_ids if key in identities)) if recent_ids else set()
+        for q in questions:
+            if identities.get(q['id'], set()) & recent_sources:
+                recent_ids.add(q['id'])
     low, high = get_difficulty_range(target)
 
     def sort_key(question: dict) -> tuple:
@@ -144,9 +160,23 @@ def _select_questions(student_id: str, target: dict, limit: int, database_path, 
         distance = max(low - difficulty, 0, difficulty - high)
         return (question["id"] in recent_ids, distance, difficulty, question["id"])
 
+    ordered = sorted(questions, key=sort_key)
+    if geometry:
+        from services.question_type_policy import select_question_type
+        selected = []
+        while ordered and len(selected) < limit:
+            fresh = [q for q in ordered if q['id'] not in recent_ids]
+            pool = fresh or ordered
+            near = [q for q in pool if low <= q['difficulty'] <= high]
+            pool = near or pool
+            kind, _ = select_question_type(pool, selected, target['mastery_score'])
+            q = min([q for q in pool if q['question_type'] == kind], key=sort_key)
+            selected.append(q)
+            ordered.remove(q)
+        ordered = selected
     return [{**question, "recently_practiced": question["id"] in recent_ids,
              "difficulty_fallback": not low <= question["difficulty"] <= high}
-            for question in sorted(questions, key=sort_key)[:limit]]
+            for question in ordered[:limit]]
 
 
 def recommend_questions(
@@ -168,6 +198,16 @@ def generate_recommendation(
     target = recommend_next_knowledge(student_id, **kwargs)
     questions = _select_questions(student_id, target, limit, database_path, taxonomy_version)
     result = {"student_id": student_id, "target_knowledge": target, "recommended_questions": questions}
+    if (taxonomy_version or get_active_taxonomy_version()) == 'geometry_v1':
+        from database.database import get_approved_questions
+        available = get_approved_questions(target['knowledge_point_id'], **kwargs)
+        levels = sorted({q['difficulty'] for q in available})
+        low, high = get_difficulty_range(target)
+        missing = [d for d in range(low, high+1) if d not in levels]
+        result['coverage_limitations'] = ([f"题库覆盖不足（coverage limitation）：{target['knowledge_point_name']}缺少" + '/'.join(f'D{d}' for d in missing) + '，待审恢复题不参与推荐。'] if missing else [])
+        result['available_difficulties'] = levels
+        result['status'] = 'ready' if questions else 'insufficient_eligible_questions'
+        result['message'] = '可以开始训练。' if questions else '暂缺满足前置条件的正式练习；请先完成基础训练。'
     if (taxonomy_version or get_active_taxonomy_version())=='function_v2':
         if not questions and limit>0:
             for alternative in sorted(calculate_student_mastery(student_id, **kwargs),key=_priority):
